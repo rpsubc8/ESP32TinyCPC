@@ -15,6 +15,8 @@ He realizado varias modificaciones:
  <li>Menú de velocidad de video de emulación, sonido, teclado</li>
  <li>Soporte para modo 8 y 64 colores.</li>
  <li>Soporte DSK de 44 tracks y 11 sectores.</li>
+ <li>Emula sólo el CRTC 0</li>
+ <li>Soporta modo 0, 1 y 2 de video</li>
  <li>VGA 400x300</li>
  <li>VGA 320x200 con o sin bordes</li>
  <li>Emulación CPC 464 y 664</li>
