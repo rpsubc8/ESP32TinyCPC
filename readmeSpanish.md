@@ -1,6 +1,6 @@
 
 # Tiny ESP32 AMSTRAD CPC
-Port del emulador de PC de Tom Walker (AMSTRAD CPC) a la placata TTGO VGA32 v1.2 con ESP32.
+Port del emulador de PC de Tom Walker (AMSTRAD CPC) a la placa TTGO VGA32 v1.2 con ESP32.
 <br>
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewCPC464.gif'></center>
 He realizado varias modificaciones:
