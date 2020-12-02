@@ -5,6 +5,7 @@ Port del emulador de PC de Tom Walker (AMSTRAD CPC) a la placa TTGO VGA32 v1.2 c
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewCPC464.gif'></center>
 He realizado varias modificaciones:
 <ul>
+ <li>Portado de x86 PC a ESP32</li>
  <li>No se usa PSRAM, funcionando en ESP32 de 520 KB de RAM (TTGO VGA32)</li> 
  <li>Uso de un sólo core</li>
  <li>OSD de bajos recursos</li>
