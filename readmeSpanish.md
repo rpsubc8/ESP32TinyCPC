@@ -67,3 +67,34 @@ Se permite cargar:
  <a href='http://tomeko.net/online_tools/file_to_hex.php?lang=en'>http://tomeko.net/online_tools/file_to_hex.php?lang=en</a>
  Los DSK por ahora estan en formato DUMP. En breves dejare la tool para generarlos.
  
+ 
+<br>
+<h1>Opciones</h1>
+El archivo <b>gbConfig.h</b> se seleccionan las opciones:
+<ul>
+ <li><b>use_lib_400x300:</b> Se usa modo de vídeo 400x300.</li> 
+ <li><b>use_lib_320x200_video_border:</b> Se usa modo de vídeo 320x200 con bordes, de manera que se reduce el tamaño de la pantalla a la mitad. Este modo consume menos RAM que el 400x300 y es más rápido.</li> 
+ <li><b>use_lib_320x200_video_noborder:</b> Se usa modo de vídeo 320x200 sin bordes. En este modo no se reduce la pantalla a la mitad, pero se pierden los bordes. Este modo consume menos RAM que el 400x300 y es más rápido.</li>
+ <li><b>use_lib_vga8colors:</li> Obliga a usar RGB modo de 8 colores (3 pines). Consume poca ram y es muy rápido, pero sólo saca 8 colores, frente a los 64 del modo normal (6 pines RRGGBB). 
+ <li><b>use_lib_vga_low_memory:</b> Modo experimental de bajo consumo de RAM de video, pero más lento.</li> 
+ <li><b>use_lib_ultrafast_vga:</b> Modo experimental ultra rápido, que se consigue casi el doble de velocidad de acceso a video.</li>
+ <li><b>use_lib_sound_ay8912:</b> Se utiliza un mezclador de 3 canales en modo dirty, emulando el AY8912. Consume bastante ram. Se requiere la librería fabgl 0.9.0</li>    
+ <li><b>use_lib_log_serial:</b> Se envian logs por puerto serie usb</li>
+ <li><b>usb_lib_optimice_checkchange_bankswitch:</b> Sólo conmuta bancos cuando son distintos, ganando velocidad.</li>
+ <li><b>use_lib_128k:</b> Permite usar el modo 128K, incluyendo la rom del 6128 en la compilación, así como 2 bloques de memoria de 64KB. Está en fase de pruebas, y al requerir más RAM, se tiene que usar otra opciones de configuración de bajo consumo de RAM.</li>
+ <li><b>use_lib_cheat_128k:</b> Modo experimental de 128 KB.</li> 
+</ul>
+
+
+
+<br>
+<h1>Aplicaciones Test</h1>
+Al arrancar el ESP32, se realiza en modo CPC464 cargando el BASIC.
+Podemos elegir los siguientes juegos:
+<ul>
+ <li><b>Corsair Trainer</b></li>
+ <li><b>Dragon Attack</b></li>
+ <li><b>Babas Palace</b></li>
+ <li><b>Amsthrees</b></li>
+ <li><b>Sokoban</b></li>
+</ul>
