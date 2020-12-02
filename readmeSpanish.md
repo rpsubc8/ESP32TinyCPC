@@ -84,6 +84,10 @@ El archivo <b>gbConfig.h</b> se seleccionan las opciones:
  <li><b>usb_lib_optimice_checkchange_bankswitch:</b> Sólo conmuta bancos cuando son distintos, ganando velocidad.</li>
  <li><b>use_lib_128k:</b> Permite usar el modo 128K, incluyendo la rom del 6128 en la compilación, así como 2 bloques de memoria de 64KB. Está en fase de pruebas, y al requerir más RAM, se tiene que usar otra opciones de configuración de bajo consumo de RAM.</li>
  <li><b>use_lib_cheat_128k:</b> Modo experimental de 128 KB.</li> 
+ <li><b>gb_ms_keyboard:</b> Se debe especificar el número de milisegundos de polling para el teclado.</li>
+ <li><b>gb_ms_sound:</b> Se debe especificar el número de milisegundos de polling para el sonido.</li>
+ <li><b>gb_frame_crt_skip:</b> Si es 1 se salta un frame.</li>
+ <li><b>gb_delay_emulate_ms:</b> Milisegundos de espera por cada frame completado.</li>
 </ul>
 
 
