@@ -57,10 +57,14 @@ Debemos desactivar la opción de PSRAM, y en caso de superar 1 MB de binario, se
 
 <br>
 <h1>Usabilidad</h1>
-Se permite cargar:
+Se permiten las siguientes accciones desde el menú (tecla F1):
  <ul>
   <li>Seleccionar Máquina permite elegir CPC 464, 664 o 6128.</li>  
   <li>Seleccionar DSK permite elegir el disco.</li>
+  <li>Offset X de la pantalla</li>
+  <li>Permite saltar un frame</li>
+  <li>Cambiar los milisegundos de polling para video, teclado y sonido</li>
+  <li>Cambiar los milisegundos de espera en cada frame</li>
  </ul>
  Se dispone de un OSD básico de bajos recursos, es decir, muy simple, que se visualiza pulsando la tecla <b>F1</b>.
  <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewOSD.gif'></center>
