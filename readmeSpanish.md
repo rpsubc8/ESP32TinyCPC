@@ -32,6 +32,8 @@ Se requiere:
   <li>Librería Arduino fabgl 0.9.0</li>
   <li>Librería Arduino bitluni 0.3.3</li>
  </ul>
+<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/ttgovga32v12.jpg'></center> 
+<br>
  
  
 <h1>PlatformIO</h1>
