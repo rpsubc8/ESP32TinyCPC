@@ -4302,8 +4302,8 @@ void loadroms2FlashModel()
  {
   if (model == 1)
   {   
-//   lorom = (unsigned char*)gb_rom_664_0;
-//   hirom[0] = (unsigned char*)gb_rom_664_1;
+   lorom = (unsigned char*)gb_rom_664_0;
+   hirom[0] = (unsigned char*)gb_rom_664_1;
    //memcpy(lorom,gb_rom_664,16384);
    //memcpy(hirom[0],&gb_rom_664[16384],16384);   
   }
