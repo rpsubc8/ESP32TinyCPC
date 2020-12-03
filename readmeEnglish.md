@@ -54,7 +54,7 @@ The whole project is compatible with the structure of Arduino 1.8.11.
 We only have to open the <b>CPCem.ino</b> from the <b>CPCem</b> directory.
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewArduinoIDEpreferences.gif'></center>
 We must install the spressif extensions in the additional card url manager <b>https://dl.espressif.com/dl/package_esp32_index.json</b>
-<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPCm/main/preview/previewArduinoIDElibrary.gif'></center>
+<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewArduinoIDElibrary.gif'></center>
 For the normal mode, the project is already prepared, so that no bitluni library is needed. However, if we need the sound support, it is required to install the libraries <b>fabgl 0.9.0</b>.
 We can do it from the library manager.
 We must deactivate the PSRAM option, and in case of exceeding 1 MB of binary, select 4 MB of partition at the time of uploading. Although the code does not use PSRAM, if the option is active and our ESP32 does not have it, an exception will be generated and restart it in loop mode.
