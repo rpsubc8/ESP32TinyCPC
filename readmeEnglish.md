@@ -34,6 +34,8 @@ Required:
   <li>Arduino fabgl bookstore 0.9.0</li>
   <li>Arduino bitluni bookcase 0.3.3</li>
  </ul>
+<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/ttgovga32v12.jpg'></center>
+<br>
  
  
 <h1>PlatformIO</h1>
