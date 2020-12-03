@@ -4,7 +4,7 @@
  #include "../gbConfig.h"
  #include "rom/romAmsdos.h"
  #include "rom/rom464.h"
- //#include "rom/rom664.h"
+ #include "rom/rom664.h"
  #if defined  use_lib_128k || defined use_lib_cheat_128k
   #include "rom/rom6128.h"
  #endif
