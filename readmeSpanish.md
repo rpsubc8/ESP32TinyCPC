@@ -59,7 +59,7 @@ Debemos desactivar la opción de PSRAM, y en caso de superar 1 MB de binario, se
 
 <br>
 <h1>Usabilidad</h1>
-Se permiten las siguientes accciones desde el menú (tecla F1):
+Se permiten las siguientes acciones desde el menú (tecla F1):
  <ul>
   <li>Seleccionar Máquina permite elegir CPC 464, 664 o 6128.</li>  
   <li>Seleccionar DSK permite elegir el disco.</li>
