@@ -88,7 +88,7 @@ El archivo <b>gbConfig.h</b> se seleccionan las opciones:
  <li><b>use_lib_sound_ay8912:</b> Se utiliza un mezclador de 3 canales en modo dirty, emulando el AY8912. Consume bastante ram. Se requiere la librería fabgl 0.9.0</li>    
  <li><b>use_lib_log_serial:</b> Se envian logs por puerto serie usb</li>
  <li><b>usb_lib_optimice_checkchange_bankswitch:</b> Sólo conmuta bancos cuando son distintos, ganando velocidad.</li>
- <li><b>use_lib_128k:</b> Permite usar el modo 128K, incluyendo la rom del 6128 en la compilación, así como 2 bloques de memoria de 64KB. Está en fase de pruebas, y al requerir más RAM, se tiene que usar otra opciones de configuración de bajo consumo de RAM.</li>
+ <li><b>use_lib_128k:</b> Permite usar el modo 128K, incluyendo la rom del 6128 en la compilación, así como 2 bloques de memoria de 64KB. Está en fase de pruebas, y al requerir más RAM, se tiene que usar otras opciones de configuración de bajo consumo de RAM.</li>
  <li><b>use_lib_cheat_128k:</b> Modo experimental de 128 KB.</li> 
  <li><b>gb_ms_keyboard:</b> Se debe especificar el número de milisegundos de polling para el teclado.</li>
  <li><b>gb_ms_sound:</b> Se debe especificar el número de milisegundos de polling para el sonido.</li>
