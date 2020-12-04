@@ -74,7 +74,7 @@ Se permiten las siguientes acciones desde el menú (tecla F1):
  <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewOSD.gif'></center>
  Los ficheros deben ser convertidos a .h en hexadecimal. Puede usarse la herramienta online:<br>
  <a href='http://tomeko.net/online_tools/file_to_hex.php?lang=en'>http://tomeko.net/online_tools/file_to_hex.php?lang=en</a>
- Los DSK por ahora estan en formato DUMP. En breves dejaré la tool para generarlos.
+ Los DSK están en formato DUMP para ahorrar memoria, y se debe uitilizar la herramienta <b>dsk2h</b> para generar los .h necesarios.
  
  
 <br>
@@ -115,9 +115,10 @@ Podemos elegir los siguientes juegos:
 
 <br>
 <h1>Tool dsk2h</h1>
-He creado una herramientra muy básica, para convertir los archivos .dsk en .h en modo lista para ser procesados por el emulador. Tan sólo tenemos que dejar los archivos .dsk en la carpeta <b>dsks</b> y ejecutar el archivo <b>dsk2h.exe</b>, de forma que se generará una salida en el directorio <b>dataFlash</b>. Para pruebas, se ha dejado 2 archivos en el directorio <b>dsks</b>, que se recomienda borrar en caso de realizar una nueva lista personalizada.
-Posteriormente debemos copiar el directorio <b>dataFlash</b> en el proyecto <b>TinyCPCEMttgovga32\CPCem</b> sobreescribiendo la carpeta dataFlash previa. Se recomienda limpiar el proyecto y volver a compilar.
-Esta herramienta es muy simple, y no controla los errores, por lo que se recomienda dejarle los archivos con nombres muy simples y lo más sencillo posible.
+He creado una herramientra muy básica, para convertir los archivos .dsk en .h en modo lista para ser procesados por el emulador. Tan sólo tenemos que dejar los archivos .dsk en la carpeta <b>dsks</b> y ejecutar el archivo <b>dsk2h.exe</b>, de forma que se generará una salida en el directorio <b>dataFlash</b>. Para pruebas, se ha dejado 2 archivos en el directorio <b>dsks</b>, que se recomienda borrar en caso de realizar una nueva lista personalizada.<br>
+<a href='https://github.com/rpsubc8/ESP32TinyCPC/tree/main/tools/dsk2h'>Tool dsk2h</a>
+Posteriormente debemos copiar el directorio <b>dataFlash</b> en el proyecto <b>TinyCPCEMttgovga32\CPCem</b> sobreescribiendo la carpeta dataFlash previa. Se recomienda limpiar el proyecto y volver a compilar.<br>
+Esta herramienta es muy simple, y no controla los errores, por lo que se recomienda dejarle los archivos con nombres muy simples y lo más sencillo posible.<br>
 El proyecto en PLATFORM.IO está preparado para 2 MB de Flash. Si necesitamos los 4MB de flash, tendremos que modificar la entrada del archivo <b>platformio.ini</b>
-<code>board_build.partitions = no_ota.csv</code>
+<pre>board_build.partitions = no_ota.csv</pre>
 En el Arduino IDE, debemos elegir la opción <b>Partitio Scheme (Huge APP)</b>.
