@@ -118,6 +118,11 @@ Podemos elegir los siguientes juegos:
 He creado una herramientra muy básica, para convertir los archivos .dsk en .h en modo lista para ser procesados por el emulador. Tan sólo tenemos que dejar los archivos .dsk en la carpeta <b>dsks</b> y ejecutar el archivo <b>dsk2h.exe</b>, de forma que se generará una salida en el directorio <b>dataFlash</b>. Para pruebas, se ha dejado 2 archivos en el directorio <b>dsks</b>, que se recomienda borrar en caso de realizar una nueva lista personalizada. También se recomienda borrar los archivos del directorio <b>CPCem\dataFlash\dsk</b> para tener un proyecto limpio.<br><br>
 <a href='https://github.com/rpsubc8/ESP32TinyCPC/tree/main/tools/dsk2h'>Tool dsk2h</a>
 <br><br>
+<pre>
+ dsks/
+ dataFlash/
+   dsk/
+</pre>
 Posteriormente debemos copiar el directorio <b>dataFlash</b> en el proyecto <b>TinyCPCEMttgovga32\CPCem</b> sobreescribiendo la carpeta dataFlash previa. Se recomienda limpiar el proyecto y volver a compilar.<br>
 Esta herramienta es muy simple, y no controla los errores, por lo que se recomienda dejarle los archivos con nombres muy simples y lo más sencillo posible.<br>
 El proyecto en PLATFORM.IO está preparado para 2 MB de Flash. Si necesitamos los 4MB de flash, tendremos que modificar la entrada del archivo <b>platformio.ini</b>
