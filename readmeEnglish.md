@@ -126,5 +126,5 @@ I have created a very basic tool, to convert .dsk files to .h in ready mode to b
 Then we must copy the directory <b>dataFlash</b> into the project <b>TinyCPCEMttgovga32\CPCem</b> overwriting the previous dataFlash folder. It is recommended to clean up the project and recompile it.<br>
 This tool is very simple, and does not control errors, so it is recommended to leave you the files with very simple names and as simple as possible.<br>
 The project in PLATFORM.IO is prepared for 2 MB of Flash. If we need the 4MB of flash, we will have to modify the entry in the file <b>platform.ini</b>
-<pre>board_build.partitions = no_ota.csv</pre>
+<pre>board_build.partitions = huge_app.csv</pre>
 In the Arduino IDE, we must choose the option <b>Partition Scheme (Huge APP)</b>.
