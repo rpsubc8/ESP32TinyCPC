@@ -43,7 +43,7 @@ Luego se seleccionará el directorio de trabajo <b>TinyCPCEMttgovga32</b>.
 Debemos modificar el fichero <b>platformio.ini</b> la opción <b>upload_port</b> para seleccionar el puerto COM donde tenemos nuestra placa TTGO VGA32.
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewPlatformIO.gif'></center>
 Luego procederemos a compilar y subir a la placa. No se usa particiones, así que debemos subir todo el binario compilado.
-Está todo preparado para no tener que instalar las librerias de bitluni. Sin embargo, si necesitamos las opciones de sonido y ratón, necesitaremos instalar las librerias de <b>fabgl</b>.
+Está todo preparado para no tener que instalar las librerias de bitluni. Sin embargo, si necesitamos las opciones de sonido, necesitaremos instalar las librerias de <b>fabgl</b>.
 
 
 <br>
