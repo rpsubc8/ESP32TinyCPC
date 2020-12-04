@@ -114,7 +114,7 @@ We can choose the following games:
  <li><b>Dragon Attack</b></li>
  <li><b>Babas Palace</b></li>
  <li><b>Amsthrees</b></li>
- <li><b>Sokoban/b></li>
+ <li><b>Sokoban</b></li>
 </ul>
 
 
