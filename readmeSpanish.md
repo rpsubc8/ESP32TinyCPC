@@ -113,7 +113,7 @@ Podemos elegir los siguientes juegos:
 </ul>
 
 
-<br>
+<br><br>
 <h1>Tool dsk2h</h1>
 He creado una herramientra muy básica, para convertir los archivos .dsk en .h en modo lista para ser procesados por el emulador. Tan sólo tenemos que dejar los archivos .dsk en la carpeta <b>dsks</b> y ejecutar el archivo <b>dsk2h.exe</b>, de forma que se generará una salida en el directorio <b>dataFlash</b>. Para pruebas, se ha dejado 2 archivos en el directorio <b>dsks</b>, que se recomienda borrar en caso de realizar una nueva lista personalizada. También se recomienda borrar los archivos del directorio <b>CPCem\dataFlash\dsk</b> para tener un proyecto limpio.<br><br>
 <a href='https://github.com/rpsubc8/ESP32TinyCPC/tree/main/tools/dsk2h'>Tool dsk2h</a>
@@ -129,7 +129,7 @@ El proyecto en PLATFORM.IO está preparado para 2 MB de Flash. Si necesitamos lo
 <pre>board_build.partitions = huge_app.csv</pre>
 En el Arduino IDE, debemos elegir la opción <b>Partition Scheme (Huge APP)</b>.
 
-<br>
+<br><br>
 <h1>CPM</h1>
 Para ejecutar el Sistema Operativo CPM se requiere el DSK del mismo, y pulsar la tecla |.<br>
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewCPM.gif'></center>
