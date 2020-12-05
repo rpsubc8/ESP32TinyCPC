@@ -131,7 +131,7 @@ En el Arduino IDE, debemos elegir la opción <b>Partition Scheme (Huge APP)</b>.
 
 <br><br>
 <h1>CPM</h1>
-Para ejecutar el Sistema Operativo CPM se requiere el DSK del mismo, y pulsar la tecla |.<br>
+Para ejecutar el Sistema Operativo CPM se requiere el DSK del mismo (no incluido en este proyecto), y pulsar la tecla |.<br>
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewCPM.gif'></center>
 La Tecla <b>Tilde</b> se saca con la combinación <b>SHIFT</b> + <b>F10</b>.
 
