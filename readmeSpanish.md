@@ -128,3 +128,10 @@ Esta herramienta es muy simple, y no controla los errores, por lo que se recomie
 El proyecto en PLATFORM.IO está preparado para 2 MB de Flash. Si necesitamos los 4MB de flash, tendremos que modificar la entrada del archivo <b>platformio.ini</b>
 <pre>board_build.partitions = huge_app.csv</pre>
 En el Arduino IDE, debemos elegir la opción <b>Partition Scheme (Huge APP)</b>.
+
+<br>
+<h1>CPM</h1>
+Para ejecutar el Sistema Operativo CPM se requiere el DSK del mismo, y pulsar la tecla |.<br>
+<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewCPM.gif'></center>
+La Tecla <b>Tilde</b> se saca con la combinación <b>SHIFT</b> + <b>F10</b>.
+
