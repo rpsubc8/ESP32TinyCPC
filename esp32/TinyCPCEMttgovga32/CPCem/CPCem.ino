@@ -162,6 +162,24 @@ int spdc=0;
 void SDL_keys_poll()
 {
 
+   //case SDLK_HOME: cpckeys[0][0]= 0; break; //Home
+   //case SDLK_PAGEDOWN: cpckeys[0][1]= 0; break; //Pg Down
+   //case SDLK_END: cpckeys[0][2]= 0; break; //End
+   cpckeys[0][3]= keymap[0x7D]; //Num keypad 9
+   cpckeys[0][4]= keymap[0x74]; //Num keypad 6
+   cpckeys[0][5]= keymap[0x7A]; //Num keypad 3
+   //case enterPad
+   //case SDLK_KP_CLEAR: cpckeys[0][7]= 0; break; //Delete supr numpad   
+
+   //case SDLK_PAGEUP: cpckeys[1][0]= 0; break; //Pg Up
+   ////case 0xFF
+   cpckeys[1][2]= keymap[0x6C]; //Num keypad 7
+   cpckeys[1][3]= keymap[0x75]; //Num keypad 8
+   cpckeys[1][4]= keymap[0x73]; //Num keypad 5
+   cpckeys[1][5]= keymap[0x69]; //Num keypad 1
+   cpckeys[1][6]= keymap[0x72]; //Num keypad 2
+   cpckeys[1][7]= keymap[0x70]; //Num keypad 0
+
    cpckeys[9][7] = cpckeys[2][0]= (keymap[0x12]==0 && keymap[0x45]==0)?0:1;//delete
    cpckeys[2][1] = keymap[0x54]; //case SDLK_OPENBRACE: 
    cpckeys[2][2]= keymap[0x5a]; //return
@@ -171,9 +189,9 @@ void SDL_keys_poll()
    cpckeys[2][6]= keymap[0x5D];; //BACKSLASH barra izquierda
    cpckeys[2][7]= keymap[0x14];//rcontrol   
                           
-   //case SDLK_F2: cpckeys[3][0]= 0; break;
-   cpckeys[3][1]= keymap[0x4E]; //MINUS -
-   //case SDLK_TILDE:
+   cpckeys[3][0]= keymap[0x06]; //F2
+   cpckeys[3][1]= keymap[0x4E]; //MINUS -   
+   cpckeys[3][2]= keymap[0x09]; //| para cpm con el shift+F10 SDLK_TILDE
    cpckeys[3][3]= keymap[0x4d]; //p
    //case SDLK_COLON: cpckeys[3][4]= 0; break; //:   
    cpckeys[3][5] = keymap[0x52]; //case SDLK_QUOTE: cpckeys[3][5]= 0; break; //'
