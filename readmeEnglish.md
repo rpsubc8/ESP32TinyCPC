@@ -15,7 +15,7 @@ I have made several modifications:
  <li>Screen adjustment X</li>
  <li>Emulation video speed menu, sound, keyboard</li>
  <li>Support for 8 and 64 color mode</li>
- <li>DSK support with 44 tracks and 11 sectors</li>
+ <li>DSK support with 42 tracks and 11 sectors</li>
  <li>Emulates only the CRTC 0</li>
  <li>Supports 0, 1 and 2 video mode</li>
  <li>VGA 400x300</li>
