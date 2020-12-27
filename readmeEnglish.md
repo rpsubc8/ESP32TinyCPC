@@ -45,7 +45,7 @@ Then the working directory <b>TinyCPCEMttgovga32</b> will be selected.
 We must modify the file <b>platformio.ini</b> the option <b>upload_port</b> to select the COM port where we have our TTGO VGA32 board.
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewPlatformIO.gif'></center>
 Then we will proceed to compile and upload to the board. No partitions are used, so we must upload all the compiled binary.
-Everything is prepared so we don't have to install the bitluni libraries. However, if we need the sound options, we will need to install the <b>fabgl</b> libraries, only for the Arduino IDE, since for PLATFORM I have left the libraries in the project.
+Everything is prepared so we don't have to install the bitluni libraries. However, if we need the sound options, we will need to install the <b>fabgl</b> libraries, only for the Arduino IDE, since for PLATFORMIO have left the libraries in the project.
 
 
 
