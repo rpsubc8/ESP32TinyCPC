@@ -11,7 +11,7 @@ I have made several modifications:
  <li>Use of a single core</li>
  <li>Low-income OSD</li>
  <li>Created project compatible with Arduino IDE and Platform IO</li>
- <li>Emulation of AY8912</li>
+ <li>Emulation of AY8912 (fabgl)</li>
  <li>Screen adjustment X</li>
  <li>Emulation video speed menu, sound, keyboard</li>
  <li>Support for 8 and 64 color mode</li>
