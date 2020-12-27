@@ -20,7 +20,7 @@
  //#define use_lib_128k 
 
  //Sound
- //#define use_lib_sound_ay8912 
+ //#define use_lib_sound_ay8912
 
  //Bank switch optimice speed
  #define usb_lib_optimice_checkchange_bankswitch

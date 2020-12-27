@@ -19,6 +19,7 @@
 #ifdef use_lib_sound_ay8912
  #include "fabgl.h" //Para fabgl
  #include "fabutils.h" //Para fabgl
+ #include "WiFiGeneric.h"
 #endif 
 
 #include "CPCEM.h"
