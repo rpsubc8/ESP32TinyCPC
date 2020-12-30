@@ -16,6 +16,11 @@
 
 #include "gbConfig.h"
 
+#ifdef use_lib_amx_mouse
+ #include "fabgl.h" //Para fabgl
+ #include "WiFiGeneric.h"; //Fix WiFiGeneric.h No such file or directory
+#endif
+
 #ifdef use_lib_sound_ay8912
  #include "fabgl.h" //Para fabgl
  #include "fabutils.h" //Para fabgl
@@ -50,9 +55,31 @@
  #endif
 #endif
 
+#ifdef use_lib_amx_mouse
+ //short int gb_sdl_mouse_x;
+ //short int gb_sdl_mouse_y;
+ //short int gb_sdl_mouse_x_before;
+ //short int gb_sdl_mouse_y_before; 
+ //unsigned char gb_auxMouseBtn;
+ //unsigned char gb_auxMouseBtn_before;
+ unsigned char gb_mouse_key_btn_left=1;
+ unsigned char gb_mouse_key_btn_right=1;
+ unsigned char gb_mouse_key_left=1;
+ unsigned char gb_mouse_key_right=1;
+ unsigned char gb_mouse_key_up=1;
+ unsigned char gb_mouse_key_down=1; 
+ #ifdef use_lib_amx_mouse_lefthanded
+  unsigned char gb_force_left_handed=1;
+ #else
+  unsigned char gb_force_left_handed=0; 
+ #endif
+ fabgl::PS2Controller PS2Controller;
+#endif 
+
 unsigned char gb_run_emulacion = 1; //Ejecuta la emulacion
 unsigned char gb_current_ms_poll_sound = gb_ms_sound;
 unsigned char gb_current_ms_poll_keyboard = gb_ms_keyboard;
+unsigned char gb_current_ms_poll_mouse = gb_ms_mouse;
 unsigned char gb_current_frame_crt_skip= gb_frame_crt_skip; //No salta frames
 unsigned char gb_current_delay_emulate_ms= gb_delay_emulate_ms;
 unsigned char gb_sdl_blit=0;
@@ -64,6 +91,7 @@ static unsigned long gb_time_ini_espera;
 //unsigned char *ramArray[8];
 static unsigned long gb_currentTime;
 static unsigned long gb_keyboardTime;
+static unsigned long gb_mouseTime;
 unsigned char *ram;
 #ifdef use_lib_mem_blocks
  unsigned char *ramArray[2]; //2 bloques de 64 KB
@@ -158,6 +186,9 @@ int spdc=0;
  } 
 #endif 
 
+#ifdef use_lib_amx_mouse
+ void PollMouse(void);
+#endif
 
 
 void SDL_keys_poll()
@@ -245,15 +276,134 @@ void SDL_keys_poll()
    cpckeys[8][6]= keymap[0x58];//capslock
    cpckeys[8][7]= keymap[0x1a];//z
 
-   cpckeys[9][0]= keymap[KEY_CURSOR_UP];  //UP
-   cpckeys[9][1]= keymap[KEY_CURSOR_DOWN]; //down
-   cpckeys[9][2]= keymap[KEY_CURSOR_LEFT]; //left
-   cpckeys[9][3]= keymap[KEY_CURSOR_RIGHT]; //right
+   #ifdef use_lib_amx_mouse
+    cpckeys[9][0]= keymap[KEY_CURSOR_UP] && gb_mouse_key_up;  //UP
+    cpckeys[9][1]= keymap[KEY_CURSOR_DOWN] && gb_mouse_key_down; //down
+    cpckeys[9][2]= keymap[KEY_CURSOR_LEFT] && gb_mouse_key_left; //left
+    cpckeys[9][3]= keymap[KEY_CURSOR_RIGHT] && gb_mouse_key_right; //right
+    #ifdef use_lib_amx_mouse_lefthanded
+     //zurdo
+     cpckeys[9][5] = keymap[0x70] && gb_mouse_key_btn_left;
+     cpckeys[9][4] = keymap[0x71] && gb_mouse_key_btn_right;  
+    #else
+     //Diestro
+     if (gb_force_left_handed == 1)
+     {//zurdo
+      cpckeys[9][5] = keymap[0x70] && gb_mouse_key_btn_left;
+      cpckeys[9][4] = keymap[0x71] && gb_mouse_key_btn_right;
+     }
+     else
+     {//diestro
+      cpckeys[9][4] = keymap[0x70] && gb_mouse_key_btn_left; //insert 0 keypad
+      cpckeys[9][5] = keymap[0x71] && gb_mouse_key_btn_right; //dot . keypad
+     }
+    #endif
+   #else
+    cpckeys[9][0]= keymap[KEY_CURSOR_UP];//UP
+    cpckeys[9][1]= keymap[KEY_CURSOR_DOWN]; //down
+    cpckeys[9][2]= keymap[KEY_CURSOR_LEFT]; //left
+    cpckeys[9][3]= keymap[KEY_CURSOR_RIGHT]; //right   
+    cpckeys[9][4] = keymap[0x70];
+    cpckeys[9][5] = keymap[0x71];
+   #endif
+
    //case SDLK_INSERT: cpckeys[9][4]= 0; break;
    //
    //
    cpckeys[9][7]= keymap[KEY_BACKSPACE]; //Backspace Borrar KEY_BACKSPACE
 }
+
+#ifdef use_lib_amx_mouse
+ void SDL_keys_mouse_set_btnLeft(unsigned char aux)
+ {  
+  #ifdef use_lib_amx_mouse_lefthanded
+   //Zurdo
+   if (gb_force_left_handed == 1)
+    cpckeys[9][4]= aux;
+   else 
+    cpckeys[9][5]= aux;
+  #else
+   //Diestro
+   if (gb_force_left_handed == 1)
+    cpckeys[9][5]= aux;
+   else 
+    cpckeys[9][4]= aux;
+  #endif 
+  //keymap[KEY_ALT_GR] = 0;   
+ }
+
+ void SDL_keys_mouse_set_btnRight(unsigned char aux)
+ {
+  #ifdef use_lib_amx_mouse_lefthanded
+   //zurdo
+   if (gb_force_left_handed == 1)
+    cpckeys[9][5]= aux;
+   else 
+    cpckeys[9][4]= aux;
+  #else
+   //diestro
+   if (gb_force_left_handed == 1)
+    cpckeys[9][4]= aux;
+   else 
+    cpckeys[9][5]= aux;
+  #endif 
+ } 
+
+void PollMouse(void)
+{
+ auto mouse = PS2Controller.mouse();
+ //cpckeys[9][4]= 1;
+ //cpckeys[9][5]= 1;
+ //keymap[KEY_CURSOR_RIGHT] = 1;
+ //keymap[KEY_CURSOR_LEFT] = 1;
+ //keymap[KEY_CURSOR_DOWN] = 1;
+ //keymap[KEY_CURSOR_UP] = 1;
+ gb_mouse_key_right = gb_mouse_key_left= gb_mouse_key_down = gb_mouse_key_up = 1;
+ //gb_mouse_key_btn_left = gb_mouse_key_btn_right = 1;
+ 
+ //MouseStatus auxStatus = mouse->getNextStatus();
+ //gb_mouse_key_btn_left = (auxStatus.buttons.left)?0:1;
+ //gb_mouse_key_btn_right= (auxStatus.buttons.right)?0:1;
+ if (mouse->deltaAvailable())
+ {  
+  MouseDelta mouseDelta;
+  mouse->getNextDelta(&mouseDelta);  
+
+  gb_mouse_key_btn_left = (mouseDelta.buttons.left)?0:1;
+  gb_mouse_key_btn_right = (mouseDelta.buttons.right)?0:1;
+
+  /*if (mouseDelta.buttons.left)     
+   SDL_keys_mouse_set_btnLeft(0);  
+  else
+   SDL_keys_mouse_set_btnLeft(1);
+
+  if (mouseDelta.buttons.right)
+   SDL_keys_mouse_set_btnRight(0);
+  else
+   SDL_keys_mouse_set_btnRight(1);
+   
+  cpckeys[9][3]= (mouseDelta.deltaX > 0)?0:1;       
+  cpckeys[9][2] = (mouseDelta.deltaX < 0)?0:1;
+  cpckeys[9][1] = (mouseDelta.deltaY < 0)?0:1;
+  cpckeys[9][0] = (mouseDelta.deltaY > 0 )?0:1; */
+
+  gb_mouse_key_right= (mouseDelta.deltaX > 0)?0:1;       
+  gb_mouse_key_left = (mouseDelta.deltaX < 0)?0:1;
+  gb_mouse_key_down = (mouseDelta.deltaY < 0)?0:1;
+  gb_mouse_key_up = (mouseDelta.deltaY > 0 )?0:1;     
+  
+  //Serial.printf("deltaX = %d  deltaY = %d  deltaZ = %d  leftBtn = %d  midBtn = %d  rightBtn = %d\n",
+  //              mouseDelta.deltaX, mouseDelta.deltaY, mouseDelta.deltaZ,
+  //              mouseDelta.buttons.left, mouseDelta.buttons.middle, mouseDelta.buttons.right);
+ }
+ 
+ //cpckeys[9][3] &= gb_mouse_key_right;
+ //cpckeys[9][2] &= gb_mouse_key_left;
+ //cpckeys[9][1] &= gb_mouse_key_down;
+ //cpckeys[9][0] &= gb_mouse_key_up;
+
+}
+#endif
 
 
 
@@ -327,6 +477,10 @@ void setup()
   Serial.printf("VGA %d\n", ESP.getFreeHeap()); 
  #endif
 
+ #ifdef use_lib_amx_mouse   
+  PS2Controller.begin();
+ #endif 
+
  kb_begin();
 
  //resolution=0;
@@ -339,6 +493,9 @@ void setup()
  loaddsk2Flash(0);
 
  gb_keyboardTime = gb_currentTime = millis();
+ #ifdef use_lib_amx_mouse
+  gb_mouseTime = gb_keyboardTime;
+ #endif
 
  #ifdef use_lib_sound_ay8912
   gb_sdl_time_sound_before = gb_currentTime;
@@ -375,11 +532,19 @@ void setup()
 void loop()
 {
  gb_currentTime = millis();
+ #ifdef use_lib_amx_mouse
+  if ((gb_currentTime-gb_mouseTime) >= gb_current_ms_poll_mouse)
+  {
+   gb_mouseTime = gb_currentTime;  
+   PollMouse();
+  }
+ #endif
+
  if ((gb_currentTime-gb_keyboardTime) >= gb_current_ms_poll_keyboard)
  { 
-  gb_keyboardTime = gb_currentTime;
+  gb_keyboardTime = gb_currentTime;  
   SDL_keys_poll();
- }
+ } 
  do_tinyOSD();
 
  if ((gb_current_delay_emulate_ms == 0) || (gb_run_emulacion == 1))

@@ -65,12 +65,13 @@ const char * gb_osd_screen_values[max_gb_osd_screen_values]={
 };
 
 
-#define max_gb_main_menu 6
+#define max_gb_main_menu 7
 const char * gb_main_menu[max_gb_main_menu]={
  "Machine",
  "Load DSK",
  "Speed",
  "Screen Adjust",
+ "Mouse buttons",
  "Reset",
  "Return"
 };
@@ -100,12 +101,13 @@ const char * gb_value_binary_menu[max_gb_value_binary_menu]={
 };
 
 
-#define max_gb_speed_videoaudio_options_menu 4
+#define max_gb_speed_videoaudio_options_menu 5
 const char * gb_speed_videoaudio_options_menu[max_gb_speed_videoaudio_options_menu]={
  "Audio poll",
  "Video delay",
  "Skip Frame",
- "Keyboard poll"
+ "Keyboard poll",
+ "Mouse poll"
 };
 
 
@@ -117,6 +119,13 @@ const char * gb_speed_videoaudio_options_menu[max_gb_speed_videoaudio_options_me
 // "8x",
 // "16x"
 //};
+
+
+#define max_gb_osd_mouse_menu 2
+const char * gb_osd_mouse_menu[max_gb_osd_mouse_menu]={
+ "right handed",
+ "left handed"
+};
 
 #define max_gb_reset_menu 2
 const char * gb_reset_menu[max_gb_reset_menu]={
@@ -350,7 +359,12 @@ void ShowTinySpeedMenu()
    if (aSelNumSpeed == 255)
     return;
    gb_current_ms_poll_keyboard= (aSelNumSpeed<<1);
-   break;   
+   break;
+  case 4: aSelNumSpeed= ShowTinyMenu("Mouse Poll ms",gb_speed_sound_menu,max_gb_speed_sound_menu);
+   if (aSelNumSpeed == 255)
+    return;   
+   gb_current_ms_poll_mouse= (aSelNumSpeed<<1);
+   break;      
   default: break;
  }
 }
@@ -429,6 +443,21 @@ void ShowTinyScreenAdjustMenu()
  */
 }
 
+void ShowTinyMouseMenu()
+{
+ #ifdef use_lib_amx_mouse    
+  unsigned char aSelNum;
+  aSelNum = ShowTinyMenu("Mouse Buttons",gb_osd_mouse_menu,max_gb_osd_mouse_menu); 
+  switch (aSelNum)
+  {
+   case 0: gb_force_left_handed= 0; break; //diestro
+   case 1: gb_force_left_handed= 1; break; //zurdo
+   default: break;
+  }
+ #endif
+ vTaskDelay(2);
+}
+
 
 //*******************************************
 void SDLActivarOSDMainMenu()
@@ -461,7 +490,8 @@ void do_tinyOSD()
 //   case 4: ShowTinySCRMenu(); break;
    case 2: ShowTinySpeedMenu(); break;
    case 3: ShowTinyScreenAdjustMenu(); break;
-   case 4: ShowTinyResetMenu(); break; 
+   case 4: ShowTinyMouseMenu(); break;
+   case 5: ShowTinyResetMenu(); break; 
     //resetz80();
     //resetcrtc();
     //SDL_Delay(2);

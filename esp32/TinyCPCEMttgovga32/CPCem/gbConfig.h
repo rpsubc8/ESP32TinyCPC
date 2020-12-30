@@ -1,6 +1,11 @@
 #ifndef _GB_CONFIG_H
  #define _GB_CONFIG_H
  
+ //usar raton amx
+ //#define use_lib_amx_mouse
+ //zurdo
+ //#define use_lib_amx_mouse_lefthanded
+
  //Video mode
  #define use_lib_400x300
  //#define use_lib_320x200_video_border
@@ -30,8 +35,9 @@
  
  
 
-
- //Read keyborad poll x millis
+ //Read mouse poll millis
+ #define gb_ms_mouse 10
+ //Read keyboard poll x millis
  #define gb_ms_keyboard 20
  //Read sound poll x millis
  #define gb_ms_sound 1

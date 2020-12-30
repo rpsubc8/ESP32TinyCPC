@@ -6,6 +6,22 @@
  extern unsigned char keymap[256];
  extern unsigned char oldKeymap[256];
 
+#ifdef use_lib_amx_mouse
+ //extern short int gb_sdl_mouse_x;
+ //extern short int gb_sdl_mouse_y;
+ //extern short int gb_sdl_mouse_x_before;
+ //extern short int gb_sdl_mouse_y_before;
+ //extern unsigned char gb_auxMouseBtn;
+ //extern unsigned char gb_auxMouseBtn_before; 
+ extern unsigned char gb_force_left_handed;
+ extern unsigned char gb_mouse_key_btn_left;
+ extern unsigned char gb_mouse_key_btn_right;
+ extern unsigned char gb_mouse_key_left;
+ extern unsigned char gb_mouse_key_right;
+ extern unsigned char gb_mouse_key_up;
+ extern unsigned char gb_mouse_key_down;
+#endif 
+
 #ifdef use_lib_sound_ay8912
  extern unsigned char gb_silence_all_channels;
 #endif 
@@ -17,6 +33,7 @@
 
 extern unsigned char gb_current_ms_poll_sound; //milisegundos muestreo
 extern unsigned char gb_current_ms_poll_keyboard; //milisegundos muestreo teclado
+extern unsigned char gb_current_ms_poll_mouse; //milisegundos muestreo raton
 extern unsigned char gb_current_frame_crt_skip; //el actual salto de frame
 extern unsigned char gb_current_delay_emulate_ms; //la espera en cada iteracion
 extern unsigned char gb_sdl_blit;
