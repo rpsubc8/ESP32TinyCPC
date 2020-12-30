@@ -7,6 +7,9 @@
  #include "dsk/dskBabasPalace.h"
  #include "dsk/dskAmsthrees.h" 
  #include "dsk/dskSokoban.h"
+ #include "dsk/dskMaxDeskt.h"
+ #include "dsk/dskAmxMouse1.h"
+ #include "dsk/dskAmxMouse2.h"
 
  //#include "dsk/dskSokoban.h"
  //#include "dsk/dskPrinceOfPersia.h"
@@ -25,14 +28,17 @@
  #include "dsk/dskMazemania.h" */
  
  //#define max_list_dsk 10
- #define max_list_dsk 5
+ #define max_list_dsk 8
  
  static const char * gb_list_dsk_title[max_list_dsk]={  
   "Corsair Trainer",
   "Dragon Attack",
   "Babas Palace",
   "Amsthrees",       
-  "Sokoban"     
+  "Sokoban",
+  "Max Deskt",
+  "AMX Mouse 1",
+  "AMX Mouse 2"  
   //"Batman Group",
   //"Batman Group2",
   //"Batman Group3",
@@ -57,7 +63,10 @@
   194816,
   204544,
   204544,
-  194816     
+  194816,
+  194816,
+  194816,
+  194816    
   //225536,
   //225536
   /*,
@@ -80,7 +89,10 @@
   gb_dsk_discsects_dragonAttack,
   gb_dsk_discsects_babasPalace,
   gb_dsk_discsects_amsthrees,
-  gb_dsk_discsects_sokoban     
+  gb_dsk_discsects_sokoban,
+  gb_dsk_discsects_maxdeskt,
+  gb_dsk_discsects_amxmouse1,
+  gb_dsk_discsects_amxmouse2  
   //gb_dsk_discsects_batmangroupdemo,
   //gb_dsk_discsects_batmangroupdemo2,
   //gb_dsk_discsects_batmangroupdemo3,
@@ -103,7 +115,10 @@
   gb_dsk_discid_dragonAttack,
   gb_dsk_discid_babasPalace,
   gb_dsk_discid_amsthrees,
-  gb_dsk_discid_sokoban     
+  gb_dsk_discid_sokoban,
+  gb_dsk_discid_maxdeskt,
+  gb_dsk_discid_amxmouse1,
+  gb_dsk_discid_amxmouse2,  
   //gb_dsk_discid_batmangroupdemo,
   //gb_dsk_discid_batmangroupdemo2,
   //gb_dsk_discid_batmangroupdemo3,
@@ -126,7 +141,10 @@
   gb_dsk_discdat_dragonAttack,
   gb_dsk_discdat_babasPalace,
   gb_dsk_discdat_amsthrees,
-  gb_dsk_discdat_sokoban       
+  gb_dsk_discdat_sokoban,
+  gb_dsk_discdat_maxdeskt,
+  gb_dsk_discdat_amxmouse1,
+  gb_dsk_discdat_amxmouse2  
   //gb_dsk_discdat_batmangroupdemo,
   //gb_dsk_discdat_batmangroupdemo2,
   //gb_dsk_discdat_batmangroupdemo3,
