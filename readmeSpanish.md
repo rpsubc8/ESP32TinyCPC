@@ -21,6 +21,7 @@ He realizado varias modificaciones:
  <li>VGA 320x200 con o sin bordes</li>
  <li>Emulación CPC 464 y 664</li>
  <li>Emulacion CPC 6128 (inestable)</li>
+ <li>Emulación de AMX Mouse</li>
 </ul> 
   
 <br>
@@ -67,8 +68,8 @@ Se permiten las siguientes acciones desde el menú (tecla F1):
   <li>Seleccionar DSK permite elegir el disco.</li>
   <li>Offset X de la pantalla</li>
   <li>Permite saltar un frame</li>
-  <li>Cambiar los milisegundos de polling para video, teclado y sonido</li>
-  <li>Cambiar los milisegundos de espera en cada frame</li>
+  <li>Cambiar los milisegundos de polling para video, teclado, ratón y sonido</li>
+  <li>Cambiar los milisegundos de espera en cada frame</li>  
  </ul>
  Se dispone de un OSD básico de bajos recursos, es decir, muy simple, que se visualiza pulsando la tecla <b>F1</b>.
  <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewOSD.gif'></center>
@@ -96,6 +97,9 @@ El archivo <b>gbConfig.h</b> se seleccionan las opciones:
  <li><b>gb_ms_sound:</b> Se debe especificar el número de milisegundos de polling para el sonido.</li>
  <li><b>gb_frame_crt_skip:</b> Si es 1 se salta un frame.</li>
  <li><b>gb_delay_emulate_ms:</b> Milisegundos de espera por cada frame completado.</li>
+ <li><b>use_lib_amx_mouse:</b> Se usa un ratón PS/2 como si fuera un AMX mouse (emulado).</li>
+ <li><b>use_lib_amx_mouse_lefthanded:</b> Ratón para zurdos (intercambia botones)</li> 
+ <li><b>gb_ms_mouse:</b> Muestreo en milisegundos de cada lectura de ratón.</li>
 </ul>
 
 
@@ -110,7 +114,16 @@ Podemos elegir los siguientes juegos:
  <li><b>Babas Palace</b></li>
  <li><b>Amsthrees</b></li>
  <li><b>Sokoban</b></li>
+ <li><b>Max Desk</b> prueba de ratón</li>
+ <li><b>AMX Mouse</b> Editor de imágenes con ratón</li> 
 </ul>
+
+<br>
+<h1>AMX Mouse</h1>
+Para poder usar un ratón como si fuera un AMX Mouse, se requiere activar en el fichero de configuración el soporte. Se necesita la libreria <b>fabgl</b>, que ya viene incluida en el proyecto PLATFORMIO, mientras que en el ARDUINO IDE debemos instalarla.
+<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewAmxMouse.gif'></center>
+Se permite configurar el ratón para zurdos (también desde el OSD), así como los tiempos de muestreo, todo ello en el fichero <b>gbConfig.h</b>.
+
 
 
 <br><br>
