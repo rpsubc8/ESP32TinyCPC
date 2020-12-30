@@ -21,7 +21,8 @@ I have made several modifications:
  <li>VGA 400x300</li>
  <li>VGA 320x200 with or without borders</li>
  <li>CPC 464 and 664 emulation</li>
- <li>CPC 6128 (unstable)</li>
+ <li>CPC 6128 emulation (unstable)</li>
+ <li>AMX mouse emulation</li>
 </ul>
 
   
@@ -100,6 +101,9 @@ The file <b>gbConfig.h</b> options are selected:
  <li><b>gb_ms_sound:</b> You must specify the number of milliseconds of polling for the sound.</li>
  <li><b>gb_frame_crt_skip:</b> If it is 1 it skips a frame.</li>
  <li><b>gb_delay_emulate_ms:</b> Millisecond wait for each completed frame.</li>
+ <li><b>use_lib_amx_mouse:</b> A PS/2 mouse is used as if it were an AMX mouse (emulated).</li>
+ <li><b>use_lib_amx_mouse_lefthanded:</b> Left-handed mouse (swaps buttons)</li>
+ <li><b>gb_ms_mouse:</b> Sampling in milliseconds of each mouse reading.</li>
 </ul>
 
 
@@ -115,6 +119,14 @@ We can choose the following games:
  <li><b>Amsthrees</b></li>
  <li><b>Sokoban</b></li>
 </ul>
+<br><br>
+
+<br>
+<h1>AMX Mouse</h1>
+To be able to use a mouse as if it were an AMX Mouse, it is required to activate the support in the configuration file. You need the <b>fabgl</b> library, which is already included in the PLATFORMIO project, while in the IDE ARDUINO we must install it. 
+<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewAmxMouse.gif'></center>
+It is possible to configure the mouse for left-handers (also from the OSD), as well as the sampling times, all in the gbConfig.h file.
+
 
 
 <br><br>
