@@ -114,8 +114,8 @@ Podemos elegir los siguientes juegos:
  <li><b>Babas Palace</b></li>
  <li><b>Amsthrees</b></li>
  <li><b>Sokoban</b></li>
- <li><b>Max Desk</b> prueba de ratón</li>
- <li><b>AMX Mouse</b> Editor de imágenes con ratón</li> 
+ <li><b>Max Desk:</b> prueba de ratón</li>
+ <li><b>AMX Mouse:</b> Editor de imágenes con ratón</li> 
 </ul>
 
 <br>
