@@ -118,6 +118,8 @@ We can choose the following games:
  <li><b>Babas Palace</b></li>
  <li><b>Amsthrees</b></li>
  <li><b>Sokoban</b></li>
+ <li><b>Max Desk:</b> mouse test</li>
+ <li><b>AMX mouse:</b> Image editor with mouse</li> 
 </ul>
 <br><br>
 
