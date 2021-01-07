@@ -75,7 +75,7 @@ Se permiten las siguientes acciones desde el menú (tecla F1):
  <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewOSD.gif'></center>
  Los ficheros deben ser convertidos a .h en hexadecimal. Puede usarse la herramienta online:<br>
  <a href='http://tomeko.net/online_tools/file_to_hex.php?lang=en'>http://tomeko.net/online_tools/file_to_hex.php?lang=en</a>
- Los DSK están en formato DUMP para ahorrar memoria, y se debe uitilizar la herramienta <b>dsk2h</b> para generar los .h necesarios.
+ Los DSK están en formato DUMP para ahorrar memoria, y se debe utilizar la herramienta <b>dsk2h</b> para generar los .h necesarios.
  
  
 <br>
