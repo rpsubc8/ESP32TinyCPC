@@ -32,9 +32,9 @@
  #define usb_lib_optimice_checkchange_bankswitch
 
  //Usar tabla precalculada 256 bytes flash znptable
- //#define use_lib_lookup_znptable
+ #define use_lib_lookup_znptable
  //Usar tabla precalculada 64 KB flash znptable16
- //#define use_lib_lookup_znptable16
+ #define use_lib_lookup_znptable16
 
  //Logs
  //#define use_lib_log_serial
