@@ -22,13 +22,19 @@
  
  //RAM mode
  //#define use_lib_cheat_128k  
- //#define use_lib_128k 
+ //#define use_lib_128k
+ //#define use_lib_fix_psram_128k
 
  //Sound
  //#define use_lib_sound_ay8912
 
  //Bank switch optimice speed
  #define usb_lib_optimice_checkchange_bankswitch
+
+ //Usar tabla precalculada 256 bytes flash znptable
+ //#define use_lib_lookup_znptable
+ //Usar tabla precalculada 64 KB flash znptable16
+ //#define use_lib_lookup_znptable16
 
  //Logs
  //#define use_lib_log_serial
