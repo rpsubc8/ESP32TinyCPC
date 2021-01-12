@@ -104,6 +104,8 @@ The file <b>gbConfig.h</b> options are selected:
  <li><b>use_lib_amx_mouse:</b> A PS/2 mouse is used as if it were an AMX mouse (emulated).</li>
  <li><b>use_lib_amx_mouse_lefthanded:</b> Left-handed mouse (swaps buttons)</li>
  <li><b>gb_ms_mouse:</b> Sampling in milliseconds of each mouse reading.</li>
+ <li><b>use_lib_lookup_znptable:</b> Uses look-up table in FLASH for BCD calculations. It consumes 256 bytes.<li>
+ <li><b>use_lib_lookup_znptable16:</b> Uses look-up table in FLASH for BCD calculations. Consumes 64 KBs.<li> 
 </ul>
 
 
