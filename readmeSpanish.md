@@ -100,6 +100,8 @@ El archivo <b>gbConfig.h</b> se seleccionan las opciones:
  <li><b>use_lib_amx_mouse:</b> Se usa un ratón PS/2 como si fuera un AMX mouse (emulado).</li>
  <li><b>use_lib_amx_mouse_lefthanded:</b> Ratón para zurdos (intercambia botones)</li> 
  <li><b>gb_ms_mouse:</b> Muestreo en milisegundos de cada lectura de ratón.</li>
+ <li><b>use_lib_lookup_znptable:</b> Usa tabla precalculada en FLASH para cálculos BCD. Consume 256 bytes.<li>
+ <li><b>use_lib_lookup_znptable16:</b> Usa tabla precalculada en FLASH para cálculos BCD. Consume 64 KBs.<li>
 </ul>
 
 
