@@ -291,7 +291,7 @@ inline void SDLputpixel32(unsigned char x, unsigned short int y, unsigned int pi
  #if (defined use_lib_400x300) || (defined use_lib_320x200_video_noborder)        
   int auxX = x<<2;//X*4
  #else
-  int auxX = x<<1;//X*2
+  int auxX = (x<<1)+x;//X*3
  #endif 
  #ifdef use_lib_ultrafast_vga
   #ifdef use_lib_vga_low_memory
@@ -322,17 +322,22 @@ inline void SDLputpixel32(unsigned char x, unsigned short int y, unsigned int pi
    #else
     //Modo 320x200 con borde    
     #ifdef use_lib_vga8colors
+     //320x200 borde 8 colores low fastvga
      if(auxX & 1){//Impar primero
       ptrVGA[y][auxX >> 1] = (ptrVGA[y][auxX >> 1] & 0xf) | (gb_const_colorNormal35[(pixel & 0x000000FF)] << 4);      
-      ptrVGA[y][(auxX+1) >> 1] = (ptrVGA[y][(auxX+1) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] & 0xf);
+      ptrVGA[y][(auxX+1) >> 1] = (ptrVGA[y][(auxX+1) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>8) & 0x000000FF)] & 0xf);
+      ptrVGA[y][(auxX+2) >> 1] = (ptrVGA[y][(auxX+2) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] << 4);
      }
      else{//Par primero
       ptrVGA[y][auxX >> 1] = (ptrVGA[y][auxX >> 1] & 0xf0) | (gb_const_colorNormal35[(pixel & 0x000000FF)] & 0xf);      
-      ptrVGA[y][(auxX+1) >> 1] = (ptrVGA[y][(auxX+1) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] << 4);
+      ptrVGA[y][(auxX+1) >> 1] = (ptrVGA[y][(auxX+1) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>8) & 0x000000FF)] << 4);
+      ptrVGA[y][(auxX+2) >> 1] = (ptrVGA[y][(auxX+2) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] & 0xf);
      }     
-    #else     
+    #else
+     //320x200 borde 64 colores low fastvga
      ptrVGA[y][auxX] = gb_const_colorNormal35[(pixel & 0x000000FF)];
-     ptrVGA[y][(auxX+1)] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+     ptrVGA[y][(auxX+1)] = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
+     ptrVGA[y][(auxX+2)] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
     #endif
    #endif
   #else
@@ -342,8 +347,10 @@ inline void SDLputpixel32(unsigned char x, unsigned short int y, unsigned int pi
     ptrVGA[y][(auxX+2)^2] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
     ptrVGA[y][(auxX+3)^2] = gb_const_colorNormal35[((pixel>>24) & 0x000000FF)];
    #else
+    //Video 320x200 borde relacion aspecto fastvga doble buffer
     ptrVGA[y][auxX^2] = gb_const_colorNormal35[(pixel & 0x000000FF)];
-    ptrVGA[y][(auxX+1)^2] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+    ptrVGA[y][(auxX+1)^2] = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
+    ptrVGA[y][(auxX+2)^2] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
    #endif 
   #endif
  #else
@@ -353,8 +360,10 @@ inline void SDLputpixel32(unsigned char x, unsigned short int y, unsigned int pi
    vga.dotFast(auxX+2,y,gb_const_colorNormal35[((pixel>>16) & 0x000000FF)]);
    vga.dotFast(auxX+3,y,gb_const_colorNormal35[((pixel>>24) & 0x000000FF)]);
   #else
+   //Video 320x200 con borde relacion aspecto normal doble buffer
    vga.dotFast(auxX,y,gb_const_colorNormal35[(pixel & 0x000000FF)]);
-   vga.dotFast(auxX+1,y,gb_const_colorNormal35[((pixel>>16) & 0x000000FF)]);
+   vga.dotFast(auxX+1,y,gb_const_colorNormal35[((pixel>>8) & 0x000000FF)]);
+   vga.dotFast(auxX+2,y,gb_const_colorNormal35[((pixel>>16) & 0x000000FF)]);
   #endif 
  #endif 
 }
@@ -458,7 +467,7 @@ void pollline()
    #else 
     #ifdef use_lib_320x200_video_border
      if (crtcline >=72 && crtcline <270){
-      SDL_hline(0,(crtcline-72)&511,xoff<<1,gaborder); //cuadrado izquierdo     
+      SDL_hline(0,(crtcline-72)&511,((xoff<<1)+xoff),gaborder); //cuadrado izquierdo     
      }       
     #endif    
    #endif
@@ -507,7 +516,7 @@ void pollline()
    #else 
     #ifdef use_lib_320x200_video_border
      if (crtcline >=72 && crtcline <270){
-      SDL_hline((x+xoff)<<1,(crtcline-72)&511,319,gaborder); //cuadrado derecho 320x200
+      SDL_hline((((x+xoff)<<1)+(x+xoff)),(crtcline-72)&511,319,gaborder); //cuadrado derecho 320x200
      }
     #endif    
    #endif 

@@ -134,9 +134,14 @@ const char * gb_reset_menu[max_gb_reset_menu]={
 };
 
 
+#ifdef use_lib_400x300
+ #define gb_pos_x_menu 120
+ #define gb_pos_y_menu 50 
+#else
+ #define gb_pos_x_menu 90
+ #define gb_pos_y_menu 50
+#endif
 
-#define gb_pos_x_menu 120
-#define gb_pos_y_menu 50
 #define gb_osd_max_rows 10
 
 void OSDMenuRowsDisplayScroll(const char **ptrValue,unsigned char currentId,unsigned char aMax)
