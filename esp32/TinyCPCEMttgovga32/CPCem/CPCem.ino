@@ -11,6 +11,7 @@
 
 #include "Emulator/Keyboard/PS2Kbd.h"
 #include <Arduino.h>
+#include "PS2Boot/PS2KeyCode.h"
 //Para ahorrar memoria
 //JJ #include <esp_bt.h>
 
@@ -197,84 +198,99 @@ void SDL_keys_poll()
    //case SDLK_HOME: cpckeys[0][0]= 0; break; //Home
    //case SDLK_PAGEDOWN: cpckeys[0][1]= 0; break; //Pg Down
    //case SDLK_END: cpckeys[0][2]= 0; break; //End
-   cpckeys[0][3]= keymap[0x7D]; //Num keypad 9
-   cpckeys[0][4]= keymap[0x74]; //Num keypad 6
-   cpckeys[0][5]= keymap[0x7A]; //Num keypad 3
+   cpckeys[0][3]= keymap[PS2_KC_KP9]; //Num keypad 9 0x7D
+   cpckeys[0][4]= keymap[PS2_KC_KP6]; //Num keypad 6 0x74
+   cpckeys[0][5]= keymap[PS2_KC_KP3]; //Num keypad 3 0x7A
    //case enterPad
    //case SDLK_KP_CLEAR: cpckeys[0][7]= 0; break; //Delete supr numpad   
 
    //case SDLK_PAGEUP: cpckeys[1][0]= 0; break; //Pg Up
    ////case 0xFF
-   cpckeys[1][2]= keymap[0x6C]; //Num keypad 7
-   cpckeys[1][3]= keymap[0x75]; //Num keypad 8
-   cpckeys[1][4]= keymap[0x73]; //Num keypad 5
-   cpckeys[1][5]= keymap[0x69]; //Num keypad 1
-   cpckeys[1][6]= keymap[0x72]; //Num keypad 2
-   cpckeys[1][7]= keymap[0x70]; //Num keypad 0
+   cpckeys[1][2]= keymap[PS2_KC_KP7]; //Num keypad 7 0x6C
+   cpckeys[1][3]= keymap[PS2_KC_KP8]; //Num keypad 8 0x75
+   cpckeys[1][4]= keymap[PS2_KC_KP5]; //Num keypad 5 0x73
+   cpckeys[1][5]= keymap[PS2_KC_KP1]; //Num keypad 1 0x69
+   cpckeys[1][6]= keymap[PS2_KC_KP2]; //Num keypad 2 0x72
+   cpckeys[1][7]= keymap[PS2_KC_KP0]; //Num keypad 0 0x70
 
-   cpckeys[9][7] = cpckeys[2][0]= (keymap[0x12]==0 && keymap[0x45]==0)?0:1;//delete
-   cpckeys[2][1] = keymap[0x54]; //case SDLK_OPENBRACE: 
-   cpckeys[2][2]= keymap[0x5a]; //return
-   cpckeys[2][3] = keymap[0x5B]; //case SDLK_CLOSEBRACE:   
+   cpckeys[9][7] = cpckeys[2][0]= (keymap[PS2_KC_L_SHIFT]==0 && keymap[PS2_KC_0]==0)?0:1;//delete shift 0x12 0x45
+   cpckeys[2][1] = keymap[PS2_KC_OPEN_SQ]; //case SDLK_OPENBRACE: 0x54
+   cpckeys[2][2]= keymap[PS2_KC_ENTER]; //return 0x5A
+   cpckeys[2][3] = keymap[PS2_KC_CLOSE_SQ]; //case SDLK_CLOSEBRACE:    0x5B
    //case SDLK_LEFT: cpckeys[2][4]= 0; break;
-   cpckeys[2][5]= keymap[0x59];//rshift
-   cpckeys[2][6]= keymap[0x5D];; //BACKSLASH barra izquierda
-   cpckeys[2][7]= keymap[0x14];//rcontrol   
+   cpckeys[2][5]= keymap[PS2_KC_R_SHIFT];//rshift 0x59
+   cpckeys[2][6]= keymap[PS2_KC_BACK];//BACKSLASH barra izquierda 0x5D
+   cpckeys[2][7]= keymap[PS2_KC_CTRL];//rcontrol   0x14
                           
-   cpckeys[3][0]= keymap[0x06]; //F2
-   cpckeys[3][1]= keymap[0x4E]; //MINUS -   
-   cpckeys[3][2]= keymap[0x09]; //| para cpm con el shift+F10 SDLK_TILDE
-   cpckeys[3][3]= keymap[0x4d]; //p
-   //case SDLK_COLON: cpckeys[3][4]= 0; break; //:   
-   cpckeys[3][5] = keymap[0x52]; //case SDLK_QUOTE: cpckeys[3][5]= 0; break; //'
+   cpckeys[3][0]= keymap[PS2_KC_F2]; //F2 0x06
+   cpckeys[3][1]= keymap[PS2_KC_MINUS]; //MINUS - 0x4E
+   cpckeys[3][2]= keymap[PS2_KC_F10]; //| para cpm con el shift+F10 SDLK_TILDE 0x09
+   cpckeys[3][3]= keymap[PS2_KC_P]; //p 0x4D   
+   if(
+      ((keymap[PS2_KC_L_SHIFT]==0) && (keymap[PS2_KC_COMMA]==0))
+      ||
+      ((keymap[PS2_KC_R_SHIFT]==0) && (keymap[PS2_KC_COMMA]==0))
+     )
+   {
+    cpckeys[3][4]= 0; //; L shift ,  R shift ,
+   }
+   else
+   {
+    cpckeys[3][4]= keymap[PS2_KC_SEMI]; //; ñ 0x4C
+   }
+
+   cpckeys[3][5] = keymap[PS2_KC_APOS]; //case SDLK_QUOTE: cpckeys[3][5]= 0; break; //' 0x52
    //case SDLK_SLASH: cpckeys[3][6]= 0; break;   
-   cpckeys[3][7]= keymap[0x49]; //teclado stop .
+   cpckeys[3][7]= keymap[PS2_KC_DOT]; //teclado stop . 0x49
 
 
-   cpckeys[4][0]= keymap[0x45]; //0
-   cpckeys[4][1]= keymap[0x46]; //9
-   cpckeys[4][2]= keymap[0x44]; //o
-   cpckeys[4][3]= keymap[0x43]; //i
-   cpckeys[4][4]= keymap[0x4b]; //l
-   cpckeys[4][5]= keymap[0x42]; //k
-   cpckeys[4][6]= keymap[0x3a]; //m
-   cpckeys[4][7]= keymap[0x41]; //,
+   cpckeys[4][0]= keymap[PS2_KC_0]; //0 0x45
+   cpckeys[4][1]= keymap[PS2_KC_9]; //9 0x46
+   cpckeys[4][2]= keymap[PS2_KC_O]; //o 0x44
+   cpckeys[4][3]= keymap[PS2_KC_I]; //i 0x43
+   cpckeys[4][4]= keymap[PS2_KC_L]; //l 0x4B
+   cpckeys[4][5]= keymap[PS2_KC_K]; //k 0x42
+   cpckeys[4][6]= keymap[PS2_KC_M]; //m 0x3A
+   if ((keymap[PS2_KC_L_SHIFT]==1)&&(keymap[PS2_KC_R_SHIFT]==1))
+   {
+    cpckeys[4][7]= keymap[PS2_KC_COMMA]; //, 0x41
+   }
 
-   cpckeys[5][0]= keymap[0x3e];//8
-   cpckeys[5][1]= keymap[0x3d];//7
-   cpckeys[5][2]= keymap[0x3c];//u
-   cpckeys[5][3]= keymap[0x35];//y
-   cpckeys[5][4]= keymap[0x33];//h
-   cpckeys[5][5]= keymap[0x3b];//j
-   cpckeys[5][6]= keymap[0x31];//n
-   cpckeys[5][7]= keymap[0x29];//space
+   cpckeys[5][0]= keymap[PS2_KC_8];//8 0x3E
+   cpckeys[5][1]= keymap[PS2_KC_7];//7 0x3D
+   cpckeys[5][2]= keymap[PS2_KC_U];//u 0x3C
+   cpckeys[5][3]= keymap[PS2_KC_Y];//y 0x35
+   cpckeys[5][4]= keymap[PS2_KC_H];//h 0x33
+   cpckeys[5][5]= keymap[PS2_KC_J];//j 0x3B
+   cpckeys[5][6]= keymap[PS2_KC_N];//n 0x31
+   cpckeys[5][7]= keymap[PS2_KC_SPACE];//space 0x29
 
-   cpckeys[6][0]= keymap[0x36];//6
-   cpckeys[6][1]= keymap[0x2e];//5
-   cpckeys[6][2]= keymap[0x2d];//r
-   cpckeys[6][3]= keymap[0x2c];//t
-   cpckeys[6][4]= keymap[0x34];//g
-   cpckeys[6][5]= keymap[0x2b];//f
-   cpckeys[6][6]= keymap[0x32];//b
-   cpckeys[6][7]= keymap[0x2a];//v
+   cpckeys[6][0]= keymap[PS2_KC_6];//6 0x36
+   cpckeys[6][1]= keymap[PS2_KC_5];//5 0x2E
+   cpckeys[6][2]= keymap[PS2_KC_R];//r 0x2D
+   cpckeys[6][3]= keymap[PS2_KC_T];//t 0x2C
+   cpckeys[6][4]= keymap[PS2_KC_G];//g 0x34
+   cpckeys[6][5]= keymap[PS2_KC_F];//f 0x2B
+   cpckeys[6][6]= keymap[PS2_KC_B];//b 0x32
+   cpckeys[6][7]= keymap[PS2_KC_V];//v 0x2A
 
-   cpckeys[7][0]= keymap[0x25];//4
-   cpckeys[7][1]= keymap[0x26];//3
-   cpckeys[7][2]= keymap[0x24];//e
-   cpckeys[7][3]= keymap[0x1d];//w
-   cpckeys[7][4]= keymap[0x1b];//s
-   cpckeys[7][5]= keymap[0x23];//d
-   cpckeys[7][6]= keymap[0x21];//c
-   cpckeys[7][7]= keymap[0x22];//x 
+   cpckeys[7][0]= keymap[PS2_KC_4];//4 0x25
+   cpckeys[7][1]= keymap[PS2_KC_3];//3 0x26
+   cpckeys[7][2]= keymap[PS2_KC_E];//e 0x24
+   cpckeys[7][3]= keymap[PS2_KC_W];//w 0x1D
+   cpckeys[7][4]= keymap[PS2_KC_S];//s 0x1B
+   cpckeys[7][5]= keymap[PS2_KC_D];//d 0x23
+   cpckeys[7][6]= keymap[PS2_KC_C];//c 0x21
+   cpckeys[7][7]= keymap[PS2_KC_X];//x 0x22
 
-   cpckeys[8][0]= keymap[0x16];//1
-   cpckeys[8][1]= keymap[0x1e];//2
-   cpckeys[8][2]= keymap[0x76];//ESCAPE
-   cpckeys[8][3]= keymap[0x15];//q
-   cpckeys[8][4]= keymap[0x0D];//tab
-   cpckeys[8][5]= keymap[0x1c];//a
-   cpckeys[8][6]= keymap[0x58];//capslock
-   cpckeys[8][7]= keymap[0x1a];//z
+   cpckeys[8][0]= keymap[PS2_KC_1];//1 0x16
+   cpckeys[8][1]= keymap[PS2_KC_2];//2 0x1E
+   cpckeys[8][2]= keymap[PS2_KC_ESC];//ESCAPE 0x76
+   cpckeys[8][3]= keymap[PS2_KC_Q];//q 0x15
+   cpckeys[8][4]= keymap[PS2_KC_TAB];//tab 0x0D
+   cpckeys[8][5]= keymap[PS2_KC_A];//a 0x1C
+   cpckeys[8][6]= keymap[PS2_KC_CAPS];//capslock 0x58
+   cpckeys[8][7]= keymap[PS2_KC_Z];//z 0x1A
 
    #ifdef use_lib_amx_mouse
     cpckeys[9][0]= keymap[KEY_CURSOR_UP] && gb_mouse_key_up;  //UP
@@ -283,19 +299,19 @@ void SDL_keys_poll()
     cpckeys[9][3]= keymap[KEY_CURSOR_RIGHT] && gb_mouse_key_right; //right
     #ifdef use_lib_amx_mouse_lefthanded
      //zurdo
-     cpckeys[9][5] = keymap[0x70] && gb_mouse_key_btn_left;
-     cpckeys[9][4] = keymap[0x71] && gb_mouse_key_btn_right;  
+     cpckeys[9][5] = keymap[PS2_KC_KP0] && gb_mouse_key_btn_left; //0x70
+     cpckeys[9][4] = keymap[PS2_KC_KP_DOT] && gb_mouse_key_btn_right;  //0x71
     #else
      //Diestro
      if (gb_force_left_handed == 1)
      {//zurdo
-      cpckeys[9][5] = keymap[0x70] && gb_mouse_key_btn_left;
-      cpckeys[9][4] = keymap[0x71] && gb_mouse_key_btn_right;
+      cpckeys[9][5] = keymap[PS2_KC_KP0] && gb_mouse_key_btn_left; //0x70
+      cpckeys[9][4] = keymap[PS2_KC_KP_DOT] && gb_mouse_key_btn_right; //0x71
      }
      else
      {//diestro
-      cpckeys[9][4] = keymap[0x70] && gb_mouse_key_btn_left; //insert 0 keypad
-      cpckeys[9][5] = keymap[0x71] && gb_mouse_key_btn_right; //dot . keypad
+      cpckeys[9][4] = keymap[PS2_KC_KP0] && gb_mouse_key_btn_left; //insert 0 keypad
+      cpckeys[9][5] = keymap[PS2_KC_KP_DOT] && gb_mouse_key_btn_right; //dot . keypad
      }
     #endif
    #else
@@ -303,8 +319,8 @@ void SDL_keys_poll()
     cpckeys[9][1]= keymap[KEY_CURSOR_DOWN]; //down
     cpckeys[9][2]= keymap[KEY_CURSOR_LEFT]; //left
     cpckeys[9][3]= keymap[KEY_CURSOR_RIGHT]; //right   
-    cpckeys[9][4] = keymap[0x70];
-    cpckeys[9][5] = keymap[0x71];
+    cpckeys[9][4] = keymap[PS2_KC_KP0];
+    cpckeys[9][5] = keymap[PS2_KC_KP_DOT];
    #endif
 
    //case SDLK_INSERT: cpckeys[9][4]= 0; break;
@@ -423,8 +439,13 @@ void setup()
    ram=(unsigned char *)malloc(0x1B000);  //truco 122880 bytes
    memset(ram,1,0x10000);
   #else
-   ram=(unsigned char *)malloc(0x10000); 
-   memset(ram,1,0x10000);
+   #ifdef use_lib_fix_psram_128k
+    ram=(unsigned char *)ps_malloc(0x20000); //Modo 128K psram
+    memset(ram,1,0x20000);
+   #else
+    ram=(unsigned char *)malloc(0x10000); //Modo 64K
+    memset(ram,1,0x10000);
+   #endif 
   #endif 
  #endif 
 
@@ -460,6 +481,9 @@ void setup()
    vga.init(vga.MODE320x200, redPins, grePins, bluPins, HSYNC_PIN, VSYNC_PIN);
   #endif 
  #endif
+ #ifdef use_lib_ultrafast_vga  
+  PrepareColorsUltraFastVGA();  
+ #endif 
  vga.setFont(Font6x8);
  vga.clear(BLACK); 
  #ifdef use_lib_ultrafast_vga

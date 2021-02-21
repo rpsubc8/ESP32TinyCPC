@@ -260,11 +260,34 @@ static unsigned char gb_const_colorNormal35[35]={
 //   vga.dot(x,y,gb_const_colorNormal35[pixel]);
 //}
 
-#define gbvgaMask8Colores 0x3F
-#define gbvgaBits8Colores 0x40
+//#define gbvgaMask8Colores 0x3F
+//#define gbvgaBits8Colores 0x40
 
+#ifdef use_lib_ultrafast_vga 
+ //**************************************
+ void PrepareColorsUltraFastVGA()
+ {  
+  //(color & RGBAXMask) | SBits;
+  #ifdef use_lib_vga8colors
+   #ifdef use_lib_vga_low_memory
+   #else
+    for (unsigned char i=0;i<35;i++)
+    {
+     gb_const_colorNormal35[i]= ((gb_const_colorNormal35[i] & vga.RGBAXMask)|vga.SBits);
+    }    
+   #endif
+  #else  
+   for (unsigned char i=0;i<35;i++)
+   {
+    gb_const_colorNormal35[i]= ((gb_const_colorNormal35[i] & vga.RGBAXMask)|vga.SBits);
+   }    
+  #endif 
+ } 
+#endif 
+
+//**************************************
 inline void SDLputpixel32(unsigned char x, unsigned short int y, unsigned int pixel)
-{
+{        
  #if (defined use_lib_400x300) || (defined use_lib_320x200_video_noborder)        
   int auxX = x<<2;//X*4
  #else
@@ -273,23 +296,54 @@ inline void SDLputpixel32(unsigned char x, unsigned short int y, unsigned int pi
  #ifdef use_lib_ultrafast_vga
   #ifdef use_lib_vga_low_memory
    #if (defined use_lib_400x300) || (defined use_lib_320x200_video_noborder)
-    ptrVGA[y][auxX] = (gb_const_colorNormal35[(pixel & 0x000000FF)]& gbvgaMask8Colores)|gbvgaBits8Colores;
-    ptrVGA[y][(auxX+1)] = (gb_const_colorNormal35[((pixel>>8) & 0x000000FF)]& gbvgaMask8Colores)|gbvgaBits8Colores;
-    ptrVGA[y][(auxX+2)] = (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)]& gbvgaMask8Colores)|gbvgaBits8Colores;
-    ptrVGA[y][(auxX+3)] = (gb_const_colorNormal35[((pixel>>24) & 0x000000FF)]& gbvgaMask8Colores)|gbvgaBits8Colores;  
+    #ifdef use_lib_vga8colors
+     if(auxX & 1){//Impar primero
+      ptrVGA[y][auxX >> 1] = (ptrVGA[y][auxX >> 1] & 0xf) | (gb_const_colorNormal35[(pixel & 0x000000FF)] << 4);      
+      ptrVGA[y][(auxX+1) >> 1] = (ptrVGA[y][(auxX+1) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>8) & 0x000000FF)] & 0xf);
+      ptrVGA[y][(auxX+2) >> 1] = (ptrVGA[y][(auxX+2) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] << 4);
+      ptrVGA[y][(auxX+3) >> 1] = (ptrVGA[y][(auxX+3) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>24) & 0x000000FF)] & 0xf);
+     }
+     else{//Par primero
+      ptrVGA[y][auxX >> 1] = (ptrVGA[y][auxX >> 1] & 0xf0) | (gb_const_colorNormal35[(pixel & 0x000000FF)] & 0xf);      
+      ptrVGA[y][(auxX+1) >> 1] = (ptrVGA[y][(auxX+1) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>8) & 0x000000FF)] << 4);
+      ptrVGA[y][(auxX+2) >> 1] = (ptrVGA[y][(auxX+2) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] & 0xf);
+      ptrVGA[y][(auxX+3) >> 1] = (ptrVGA[y][(auxX+3) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>24) & 0x000000FF)] << 4);
+     }
+     //ptrVGA[y][auxX] = gb_const_colorNormal35[(pixel & 0x000000FF)];
+     //ptrVGA[y][(auxX+1)] = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
+     //ptrVGA[y][(auxX+2)] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+     //ptrVGA[y][(auxX+3)] = gb_const_colorNormal35[((pixel>>24) & 0x000000FF)];
+    #else     
+     ptrVGA[y][auxX] = gb_const_colorNormal35[(pixel & 0x000000FF)];
+     ptrVGA[y][(auxX+1)] = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
+     ptrVGA[y][(auxX+2)] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+     ptrVGA[y][(auxX+3)] = gb_const_colorNormal35[((pixel>>24) & 0x000000FF)];
+    #endif
    #else
-    ptrVGA[y][auxX] = (gb_const_colorNormal35[(pixel & 0x000000FF)]& gbvgaMask8Colores)|gbvgaBits8Colores;
-    ptrVGA[y][(auxX+1)] = (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)]& gbvgaMask8Colores)|gbvgaBits8Colores;
+    //Modo 320x200 con borde    
+    #ifdef use_lib_vga8colors
+     if(auxX & 1){//Impar primero
+      ptrVGA[y][auxX >> 1] = (ptrVGA[y][auxX >> 1] & 0xf) | (gb_const_colorNormal35[(pixel & 0x000000FF)] << 4);      
+      ptrVGA[y][(auxX+1) >> 1] = (ptrVGA[y][(auxX+1) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] & 0xf);
+     }
+     else{//Par primero
+      ptrVGA[y][auxX >> 1] = (ptrVGA[y][auxX >> 1] & 0xf0) | (gb_const_colorNormal35[(pixel & 0x000000FF)] & 0xf);      
+      ptrVGA[y][(auxX+1) >> 1] = (ptrVGA[y][(auxX+1) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] << 4);
+     }     
+    #else     
+     ptrVGA[y][auxX] = gb_const_colorNormal35[(pixel & 0x000000FF)];
+     ptrVGA[y][(auxX+1)] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+    #endif
    #endif
   #else
    #if (defined use_lib_400x300) || (defined use_lib_320x200_video_noborder)
-    ptrVGA[y][auxX^2] = (gb_const_colorNormal35[(pixel & 0x000000FF)]& gbvgaMask8Colores)|gbvgaBits8Colores;
-    ptrVGA[y][(auxX+1)^2] = (gb_const_colorNormal35[((pixel>>8) & 0x000000FF)]& gbvgaMask8Colores)|gbvgaBits8Colores;
-    ptrVGA[y][(auxX+2)^2] = (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)]& gbvgaMask8Colores)|gbvgaBits8Colores;
-    ptrVGA[y][(auxX+3)^2] = (gb_const_colorNormal35[((pixel>>24) & 0x000000FF)]& gbvgaMask8Colores)|gbvgaBits8Colores;
+    ptrVGA[y][auxX^2] = gb_const_colorNormal35[(pixel & 0x000000FF)];
+    ptrVGA[y][(auxX+1)^2] = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
+    ptrVGA[y][(auxX+2)^2] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+    ptrVGA[y][(auxX+3)^2] = gb_const_colorNormal35[((pixel>>24) & 0x000000FF)];
    #else
-    ptrVGA[y][auxX^2] = (gb_const_colorNormal35[(pixel & 0x000000FF)]& gbvgaMask8Colores)|gbvgaBits8Colores;
-    ptrVGA[y][(auxX+1)^2] = (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)]& gbvgaMask8Colores)|gbvgaBits8Colores;
+    ptrVGA[y][auxX^2] = gb_const_colorNormal35[(pixel & 0x000000FF)];
+    ptrVGA[y][(auxX+1)^2] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
    #endif 
   #endif
  #else
@@ -305,15 +359,29 @@ inline void SDLputpixel32(unsigned char x, unsigned short int y, unsigned int pi
  #endif 
 }
 
+//*****************************************************************
 inline void SDL_hline(int x1,int y1,int x2,unsigned char pixel)
 {              
  #ifdef use_lib_ultrafast_vga        
   #ifdef use_lib_vga_low_memory
-   for (int x=x1;x<x2;x++)
-    ptrVGA[y1][x] = (gb_const_colorNormal35[pixel] & gbvgaMask8Colores)|gbvgaBits8Colores;   
+   #ifdef use_lib_vga8colors
+    for (int x=x1;x<x2;x++)
+    {
+     if(x & 1)
+      ptrVGA[y1][x >> 1] =  (ptrVGA[y1][x >> 1] & 0xf) | (gb_const_colorNormal35[pixel] << 4);
+     else
+      ptrVGA[y1][x >> 1] = (ptrVGA[y1][x >> 1] & 0xf0) | (gb_const_colorNormal35[pixel] & 0xf);
+     //ptrVGA[y1][x] = gb_const_colorNormal35[pixel];
+    }
+   #else
+    for (int x=x1;x<x2;x++)
+    {
+     ptrVGA[y1][x] = gb_const_colorNormal35[pixel];
+    }
+   #endif
   #else
    for (int x=x1;x<x2;x++)
-    ptrVGA[y1][x^2] = (gb_const_colorNormal35[pixel] & gbvgaMask8Colores)|gbvgaBits8Colores;     
+    ptrVGA[y1][x^2] = gb_const_colorNormal35[pixel];
   #endif  
  #else
   for (int x=x1;x<x2;x++)
@@ -321,6 +389,7 @@ inline void SDL_hline(int x1,int y1,int x2,unsigned char pixel)
  #endif
 }
 
+//******************************
 void pollline()
 {
  int aux_d;

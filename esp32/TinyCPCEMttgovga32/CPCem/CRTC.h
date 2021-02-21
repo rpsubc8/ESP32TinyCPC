@@ -11,5 +11,8 @@
  void pollline(void); 
  void writecrtc(unsigned short a, unsigned char v);
  unsigned char readcrtc(unsigned short a);
+ #ifdef use_lib_ultrafast_vga  
+  void PrepareColorsUltraFastVGA(void);  
+ #endif 
  
 #endif
