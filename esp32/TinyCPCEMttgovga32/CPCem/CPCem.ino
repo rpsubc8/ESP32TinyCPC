@@ -28,7 +28,7 @@
  #include "WiFiGeneric.h"
 #endif 
 
-#include "CPCEM.h"
+#include "CPCem.h"
 #include "MartianVGA.h"
 #include "def/Font.h"
 #include "def/hardware.h"

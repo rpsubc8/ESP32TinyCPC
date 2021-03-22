@@ -1,6 +1,6 @@
 #include "gbConfig.h"
 #include <stdio.h>
-#include "CPCEM.h"
+#include "CPCem.h"
 #include "PSG.h"
 #include "gb_globals.h"
 

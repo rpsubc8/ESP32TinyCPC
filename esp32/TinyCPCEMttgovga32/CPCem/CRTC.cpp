@@ -1,7 +1,7 @@
 #include "gbConfig.h"
 #include "string.h"
 #include "CRTC.h"
-#include "CPCEM.h"
+#include "CPCem.h"
 #include "gb_globals.h"
 
 int crtcvsync;

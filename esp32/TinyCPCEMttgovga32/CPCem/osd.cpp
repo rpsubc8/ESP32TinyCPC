@@ -1,5 +1,5 @@
 #include "gbConfig.h"
-#include "CPCEM.h"
+#include "CPCem.h"
 #include "osd.h"
 #include "CRTC.h"
 #include "FDC.h"
