@@ -6,7 +6,7 @@ Port del emulador de PC de Tom Walker (AMSTRAD CPC) a la placa TTGO VGA32 v1.2 c
 He realizado varias modificaciones:
 <ul>
  <li>Portado de x86 PC a ESP32</li>
- <li>No se usa PSRAM, funcionando en ESP32 de 520 KB de RAM (TTGO VGA32)</li> 
+ <li>No se usa PSRAM, funcionando en ESP32 de 520 KB de RAM (TTGO VGA32 v1.2)</li> 
  <li>Uso de un sólo core</li>
  <li>OSD de bajos recursos</li>
  <li>Creado proyecto compatible con Arduino IDE y Platform IO</li>
@@ -28,6 +28,7 @@ He realizado varias modificaciones:
 <h1>Requerimientos</h1>
 Se requiere:
  <ul>
+  <li>TTGO VGA32 v1.2</li>
   <li>Visual Studio 1.48.1 PLATFORMIO 2.2.0</li>
   <li>Arduino IDE 1.8.11</li>
   <li>Librería Arduino fabgl 0.9.0 (incluida en proyecto PLATFORMIO)</li>
