@@ -1,11 +1,10 @@
 
 
 # Tiny ESP32 AMSTRAD CPC
-<div class="alert alert-primary" role="alert">
- The English documentation of the new version 2021/14/11 is not yet updated. Only the Spanish version.
-</div>
-Port from Tom Walker's PC emulator (AMSTRAD CPC) to TTGO VGA32 v1.2 board with ESP32.
 <br>
+<h2><font color="#FF0000">English documentation of the new version 2021/14/11 is not yet updated. Only the Spanish version.</h2>
+Port from Tom Walker's PC emulator (AMSTRAD CPC) to TTGO VGA32 v1.2 board with ESP32.</font>
+<br><br>
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewCPC464.gif'></center>
 I have made several modifications:
 <ul>
