@@ -1,17 +1,19 @@
 //Port Cpc-em (Tom Walker) emulator to TTGO VGA32 by ackerman:
+// 2021-11-14
+// One core, only SRAM (no psram)
 // DSK 44 tracks 11 sectors
-// VGA 400x300, 320x200
+// VGA 400x300, 320x200 (border, no norder)
 // Mode 464, 664, 6128
 // Modo 128K (inestable)
-// Low video ram mode
+// Tiny mouse library Arduino mod fix (Rob Kent jazzycamel)
+// Tiny Bitluni 0.3.3 mod C fix 8 colors (Ricardo Massaro)
 // Mode 8 colors, 64 colors
-// Audio AY8912 fabgl library 0.9.0 (not include)
+// Tiny Audio AY8912 fabgl library 0.9.0 included (version dcrespo3d David Crespo Tascon)
 // VGA library bitluni 0.3.3 (include)
 // gbConfig options configuration compile
+// Arduino IDE 1.8.11
+// Visual Studio 1.48.1 PLATFORMIO 2.2.1 Espressif32 v3.3.2
 
-//Antes
-//RAM:   [=         ]   8.8% (used 28912 bytes from 327680 bytes)
-//Flash: [========  ]  81.6% (used 2567034 bytes from 3145728 bytes)
 #include "gbConfig.h"
 
 #include "PS2Kbd.h"
