@@ -71,9 +71,11 @@ Se permiten las siguientes acciones desde el menú (tecla F1):
   <li>Permite saltar un frame</li>
   <li>Cambiar los milisegundos de polling para video, teclado, ratón y sonido</li>
   <li>Cambiar los milisegundos de espera en cada frame</li>
-  <li>Sonido Volumen (100%, 75,%, 50%, 25%, 55)</li>
+  <li>Sonido Volumen (100%, 75,%, 50%, 25%, 5%)</li>
   <li>Sonido activo o en silencio</li>
   <li>Espera de CPU en modo AUTO (ajuste 20 ms por frame real) o la espera en ms que queramos</li>
+  <li>Ratón Detectar, permite volver a inicializar el ratón, si se ha desconectado en caliente</li>
+  <li>Ratón ON y OFF, permite inhabilitar la lectura del ratón. De está forma la emulación va más rápida.</li>
  </ul>
  Se dispone de un OSD básico de bajos recursos, es decir, muy simple, que se visualiza pulsando la tecla <b>F1</b>.
  <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewOSD.gif'></center>
