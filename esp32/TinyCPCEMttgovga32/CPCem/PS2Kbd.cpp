@@ -1,14 +1,13 @@
-#include "MartianVGA.h"
-#include "CPCem.h"
-#include "def/hardware.h"
-#include "def/keys.h"
-#include "Emulator/Keyboard/PS2Kbd.h"
-#include <Arduino.h>
-#include "gb_globals.h"
 #include "gbConfig.h"
+#include "gbGlobals.h"
+#include "CPCem.h"
+#include "hardware.h"
+#include "keys.h"
+#include "PS2Kbd.h"
+#include <Arduino.h>
 
-unsigned char keymap[256];
-unsigned char oldKeymap[256];
+volatile unsigned char keymap[256];
+volatile unsigned char oldKeymap[256];
 
 unsigned int shift = 0;
 byte lastcode = 0;
@@ -74,23 +73,23 @@ void IRAM_ATTR kb_interruptHandler(void) {
     }
 }
 
-#define FIX_PERIBOARD_NOT_INITING
-#ifdef  FIX_PERIBOARD_NOT_INITING
-#include "PS2Boot/PS2KeyAdvanced.h"
-PS2KeyAdvanced ps2boot;
+//#define FIX_PERIBOARD_NOT_INITING
+#ifdef FIX_PERIBOARD_NOT_INITING
+ #include "PS2KeyAdvanced.h"
+ PS2KeyAdvanced ps2boot;
 #endif
 
 void kb_begin()
 {
-#ifdef  FIX_PERIBOARD_NOT_INITING
-    // Configure the keyboard library
-    ps2boot.begin( KEYBOARD_DATA, KEYBOARD_CLK );
-    ps2boot.echo( );              // ping keyboard to see if there
-    delay( 6 );
-    ps2boot.read( );
-    delay( 6 );
-    ps2boot.terminate();
-#endif
+ #ifdef FIX_PERIBOARD_NOT_INITING
+  //Configure the keyboard library
+  ps2boot.begin( KEYBOARD_DATA, KEYBOARD_CLK );
+  ps2boot.echo( );              // ping keyboard to see if there
+  delay( 6 );
+  ps2boot.read( );
+  delay( 6 );
+  ps2boot.terminate();
+ #endif
 
     pinMode(KEYBOARD_DATA, INPUT_PULLUP);
     pinMode(KEYBOARD_CLK, INPUT_PULLUP);
@@ -98,8 +97,8 @@ void kb_begin()
     digitalWrite(KEYBOARD_CLK, true);
     attachInterrupt(digitalPinToInterrupt(KEYBOARD_CLK), kb_interruptHandler, FALLING);
 
-    memset(keymap, 1, sizeof(keymap));
-    memset(oldKeymap, 1, sizeof(oldKeymap));
+    memset((void *)keymap, 1, sizeof(keymap));
+    memset((void *)oldKeymap, 1, sizeof(oldKeymap));
 }
 
 // Check if keymatrix is changed

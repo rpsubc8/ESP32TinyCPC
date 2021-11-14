@@ -1,139 +1,143 @@
-/* Version V1.0.7
-  PS2KeyAdvanced.cpp - PS2KeyAdvanced library
-  Copyright (c) 2007 Free Software Foundation.  All right reserved.
-  Written by Paul Carpenter, PC Services <sales@pcserviceselectronics.co.uk>
-  Created September 2014
-  Updated January 2016 - Paul Carpenter - add tested on Due and tidy ups for V1.5 Library Management
-    January 2020   Fix typos, correct keyboard reset status improve library.properties 
-		   and additional platform handling and some documentation
-    March 2020  Add SAMD1 as recognised support as has been tested by user
-                Improve different architecture handling
+// Version V1.0.7
+//  PS2KeyAdvanced.cpp - PS2KeyAdvanced library
+//  Copyright (c) 2007 Free Software Foundation.  All right reserved.
+//  Written by Paul Carpenter, PC Services <sales@pcserviceselectronics.co.uk>
+//  Created September 2014
+//  Updated January 2016 - Paul Carpenter - add tested on Due and tidy ups for V1.5 Library Management
+//    January 2020   Fix typos, correct keyboard reset status improve library.properties 
+//		   and additional platform handling and some documentation
+//    March 2020  Add SAMD1 as recognised support as has been tested by user
+//                Improve different architecture handling
+//
+//  IMPORTANT WARNING
+// 
+//    If using a DUE or similar board with 3V3 I/O you MUST put a level translator 
+//    like a Texas Instruments TXS0102 or FET circuit as the signals are 
+//    Bi-directional (signals transmitted from both ends on same wire).
+// 
+//    Failure to do so may damage your Arduino Due or similar board.
+//
+//  Test History
+//    September 2014 Uno and Mega 2560 September 2014 using Arduino V1.6.0
+//    January 2016   Uno, Mega 2560 and Due using Arduino 1.6.7 and Due Board 
+//                    Manager V1.6.6
+//                    
+//
+//  Assumption - Only ONE keyboard added to one Arduino
+//             - No stream support
+//
+//  This is for a LATIN style keyboard using Scan code set 2. See various
+//  websites on what different scan code sets use. Scan Code Set 2 is the
+//  default scan code set for PS2 keyboards on power up.
+//
+//  Fully featured PS2 keyboard library to provide
+//    All keys as a keycode (A-Z and 0-9 as ASCII equivalents)
+//    All function and movement keys supported even multi-lingual
+//    Parity checking of data sent/received on receive request keyboard resend
+//    Resends data when needed handles keyboard protocol for RESEND and ECHO
+//    Functions for get and set of
+//        Scancode set in use READ only
+//        LED and LOCK control
+//        ReadID
+//        Reset keyboard
+//        Send ECHO
+//        Handles NUM, _CAPS and SCROLL lock keys to LEDs
+//        Handles NUM/SCROLL internally
+//
+//  Returns an uint16_t containing
+//        Make/Break status
+//        CAPS status
+//        SHIFT, CTRL, ALT, ALT GR, GUI keys
+//        Flag for function key not a displayable/printable character
+//        8 bit key code
+//
+//    Code Ranges(bottom byte of uint16_t) see PS2KeyAdvanced.h for details
+//        0       invalid/error
+//        1-1F    Functions (_CAPS, _SHIFT, _ALT, Enter, DEL... )
+//        1A-1F   Functions with ASCII control code
+//                    (DEL, BS, TAB, ESC, ENTER, SPACE)
+//        20-60   Printable characters noting
+//                    0-9 = 0x30 to 0x39 as ASCII
+//                    A to Z = 0x41 to 0x5A as upper case ASCII type codes
+//                    8B Extra European key
+//        61-A0   Function keys and other special keys (plus F2 and F1 less 8B)
+//                    61-78 F1 to F24
+//                    79-8A Multimedia
+//                    8C-8E ACPI power
+//                    91-A0 and F2 and F1 - Special multilingual
+//        A8-FF   Keyboard communications commands (note F2 and F1 are special
+//                codes for special multi-lingual keyboards)
+//
+//    By using these ranges it is possible to perform detection of any key and do
+//    easy translation to ASCII/UTF-8 avoiding keys that do not have a valid code.
+//
+//    Top Byte is 8 bits denoting as follows with defines for bit code
+//
+//        Define name bit     description
+//        PS2_BREAK   15      1 = Break key code
+//                   (MSB)    0 = Make Key code
+//        PS2_SHIFT   14      1 = Shift key pressed as well (either side)
+//                            0 = NO shift key
+//        PS2_CTRL    13      1 = Ctrl key pressed as well (either side)
+//                            0 = NO Ctrl key
+//        PS2_CAPS    12      1 = Caps Lock ON
+//                            0 = Caps lock OFF
+//        PS2_ALT     11      1 = Left Alt key pressed as well
+//                            0 = NO Left Alt key
+//        PS2_ALT_GR  10      1 = Right Alt (Alt GR) key pressed as well
+//                            0 = NO Right Alt key
+//        PS2_GUI      9      1 = GUI key pressed as well (either)
+//                            0 = NO GUI key
+//        PS2_FUNCTION 8      1 = FUNCTION key non-printable character (plus space, tab, enter)
+//                            0 = standard character key
+//
+//  Error Codes
+//     Most functions return 0 or 0xFFFF as error, other codes to note and
+//     handle appropriately value in bottom byte
+//        0xAA   keyboard has reset and passed power up tests
+//               will happen if keyboard plugged in after code start
+//        0xFC   Keyboard General error or power up fail
+//
+//  It is responsibility of your programme to deal with converting special cases
+//  like <_CTRL>+<ENTER> sends a special code to something else. A better method
+//  is to use PS2KeyMap library and add your own table to that library. If you
+//  wish to do that make a NEW library called SOMETHING different NOT a variant
+//  or revision of this one, as you are changing base functionality
+//
+//  See PS2KeyCode.h for codes from the keyboard this library uses to decode.
+//  (may disappear in updates do not rely on this file or definitions)
+//
+//  See PS2KeyAvanced.h for returned definitions of Keys and accessible
+//  definitions
+//
+//  See PS2KeyMap.h for tables currently supported
+//
+//  To get the key as ASCII/UTF-8 single byte character conversion requires use
+//  of PS2KeyMap library AS WELL.
+//
+//  This library is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU Lesser General Public
+//  License as published by the Free Software Foundation; either
+//  version 2.1 of the License, or (at your option) any later version.
+//
+//  This library is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//  Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public
+//  License along with this library; if not, write to the Free Software
+//  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-  IMPORTANT WARNING
- 
-    If using a DUE or similar board with 3V3 I/O you MUST put a level translator 
-    like a Texas Instruments TXS0102 or FET circuit as the signals are 
-    Bi-directional (signals transmitted from both ends on same wire).
- 
-    Failure to do so may damage your Arduino Due or similar board.
 
-  Test History
-    September 2014 Uno and Mega 2560 September 2014 using Arduino V1.6.0
-    January 2016   Uno, Mega 2560 and Due using Arduino 1.6.7 and Due Board 
-                    Manager V1.6.6
-                    
+ #include "gbConfig.h"
+ #ifdef FIX_PERIBOARD_NOT_INITING
 
-  Assumption - Only ONE keyboard added to one Arduino
-             - No stream support
-
-  This is for a LATIN style keyboard using Scan code set 2. See various
-  websites on what different scan code sets use. Scan Code Set 2 is the
-  default scan code set for PS2 keyboards on power up.
-
-  Fully featured PS2 keyboard library to provide
-    All keys as a keycode (A-Z and 0-9 as ASCII equivalents)
-    All function and movement keys supported even multi-lingual
-    Parity checking of data sent/received on receive request keyboard resend
-    Resends data when needed handles keyboard protocol for RESEND and ECHO
-    Functions for get and set of
-        Scancode set in use READ only
-        LED and LOCK control
-        ReadID
-        Reset keyboard
-        Send ECHO
-        Handles NUM, _CAPS and SCROLL lock keys to LEDs
-        Handles NUM/SCROLL internally
-
-  Returns an uint16_t containing
-        Make/Break status
-        CAPS status
-        SHIFT, CTRL, ALT, ALT GR, GUI keys
-        Flag for function key not a displayable/printable character
-        8 bit key code
-
-    Code Ranges(bottom byte of uint16_t) see PS2KeyAdvanced.h for details
-        0       invalid/error
-        1-1F    Functions (_CAPS, _SHIFT, _ALT, Enter, DEL... )
-        1A-1F   Functions with ASCII control code
-                    (DEL, BS, TAB, ESC, ENTER, SPACE)
-        20-60   Printable characters noting
-                    0-9 = 0x30 to 0x39 as ASCII
-                    A to Z = 0x41 to 0x5A as upper case ASCII type codes
-                    8B Extra European key
-        61-A0   Function keys and other special keys (plus F2 and F1 less 8B)
-                    61-78 F1 to F24
-                    79-8A Multimedia
-                    8C-8E ACPI power
-                    91-A0 and F2 and F1 - Special multilingual
-        A8-FF   Keyboard communications commands (note F2 and F1 are special
-                codes for special multi-lingual keyboards)
-
-    By using these ranges it is possible to perform detection of any key and do
-    easy translation to ASCII/UTF-8 avoiding keys that do not have a valid code.
-
-    Top Byte is 8 bits denoting as follows with defines for bit code
-
-        Define name bit     description
-        PS2_BREAK   15      1 = Break key code
-                   (MSB)    0 = Make Key code
-        PS2_SHIFT   14      1 = Shift key pressed as well (either side)
-                            0 = NO shift key
-        PS2_CTRL    13      1 = Ctrl key pressed as well (either side)
-                            0 = NO Ctrl key
-        PS2_CAPS    12      1 = Caps Lock ON
-                            0 = Caps lock OFF
-        PS2_ALT     11      1 = Left Alt key pressed as well
-                            0 = NO Left Alt key
-        PS2_ALT_GR  10      1 = Right Alt (Alt GR) key pressed as well
-                            0 = NO Right Alt key
-        PS2_GUI      9      1 = GUI key pressed as well (either)
-                            0 = NO GUI key
-        PS2_FUNCTION 8      1 = FUNCTION key non-printable character (plus space, tab, enter)
-                            0 = standard character key
-
-  Error Codes
-     Most functions return 0 or 0xFFFF as error, other codes to note and
-     handle appropriately value in bottom byte
-        0xAA   keyboard has reset and passed power up tests
-               will happen if keyboard plugged in after code start
-        0xFC   Keyboard General error or power up fail
-
-  It is responsibility of your programme to deal with converting special cases
-  like <_CTRL>+<ENTER> sends a special code to something else. A better method
-  is to use PS2KeyMap library and add your own table to that library. If you
-  wish to do that make a NEW library called SOMETHING different NOT a variant
-  or revision of this one, as you are changing base functionality
-
-  See PS2KeyCode.h for codes from the keyboard this library uses to decode.
-  (may disappear in updates do not rely on this file or definitions)
-
-  See PS2KeyAvanced.h for returned definitions of Keys and accessible
-  definitions
-
-  See PS2KeyMap.h for tables currently supported
-
-  To get the key as ASCII/UTF-8 single byte character conversion requires use
-  of PS2KeyMap library AS WELL.
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
 #include <Arduino.h>
 // Internal headers for library defines/codes/etc
-#include "PS2Boot/PS2KeyAdvanced.h"
-#include "PS2Boot/PS2KeyCode.h"
-#include "PS2Boot/PS2KeyTable.h"
+#include "PS2KeyAdvanced.h"
+#include "PS2KeyCode.h"
+#include "PS2KeyTable.h"
 
 
 // Private function declarations
@@ -1011,3 +1015,5 @@ void PS2KeyAdvanced::terminate()
 {
   detachInterrupt(PS2_IrqPin);
 }
+
+#endif

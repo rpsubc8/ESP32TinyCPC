@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "FDC.h"
-#include "gb_globals.h"
+#include "gbGlobals.h"
 #include "dataFlash/gbdsk.h"
 #include <iostream>
 

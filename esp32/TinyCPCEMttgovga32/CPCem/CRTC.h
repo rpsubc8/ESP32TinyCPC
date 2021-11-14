@@ -5,14 +5,18 @@
  //CRTC
  //void initvid(void);
  //JJ void makelookup(void); //sin precalculada
+ void jj_fast_putpixel(int x,int y,unsigned char c);
+ void SDLClear(void);
+
  void resetcrtc(void);
  void remakelookup(void);
  //void switchres(void);
  void pollline(void); 
  void writecrtc(unsigned short a, unsigned char v);
  unsigned char readcrtc(unsigned short a);
- #ifdef use_lib_ultrafast_vga  
-  void PrepareColorsUltraFastVGA(void);  
- #endif 
+ void PrepareColorsUltraFastVGA(void);
+ //#ifdef use_lib_ultrafast_vga  
+ // void PrepareColorsUltraFastVGA(void);
+ //#endif 
  
 #endif

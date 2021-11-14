@@ -5,8 +5,9 @@
 #include "FDC.h"
 #include "Z80.h"
 #include "dataFlash/gbdsk.h"
-#include "gb_globals.h"
-#include "Emulator/Keyboard/PS2Kbd.h"
+#include "gbGlobals.h"
+#include "PS2Kbd.h"
+#include "gb_sdl_font8x8.h"
 
 
 //#define BLACK   0
@@ -29,6 +30,16 @@
  #define WHITE   0x0F      // 0000 1111
 #endif
 
+
+#ifdef use_lib_vga8colors
+ #define ID_COLOR_BLACK 0 //Negro
+ #define ID_COLOR_WHITE 12 //Blanco
+ #define ID_COLOR_MAGENTA 6 //Magenta
+#else
+ #define ID_COLOR_BLACK 0 //Negro
+ #define ID_COLOR_WHITE 12 //Blanco
+ #define ID_COLOR_MAGENTA 6 //Magenta
+#endif 
 
 //extern int gb_screen_xIni;
 //extern int gb_screen_yIni;
@@ -65,13 +76,14 @@ const char * gb_osd_screen_values[max_gb_osd_screen_values]={
 };
 
 
-#define max_gb_main_menu 7
+#define max_gb_main_menu 8
 const char * gb_main_menu[max_gb_main_menu]={
  "Machine",
  "Load DSK",
  "Speed",
  "Screen Adjust",
- "Mouse buttons",
+ "Mouse",
+ "Sound",
  "Reset",
  "Return"
 };
@@ -83,28 +95,44 @@ const char * gb_machine_menu[max_gb_machine_menu]={
  "6128"
 };
 
-#define max_gb_speed_sound_menu 7
-const char * gb_speed_sound_menu[max_gb_speed_sound_menu]={
- "0",
- "1",
- "2",
- "4",
- "8",
- "16",
- "32"
+#define max_gb_osd_sound_menu 2
+const char * gb_osd_sound_menu[max_gb_osd_sound_menu]={
+ "Sound Enabled",
+ "Sound Volume"
 };
+
+#define max_gb_speed_sound_menu 52
+const char * gb_speed_sound_menu[max_gb_speed_sound_menu]={
+ "0 (FAST)","1","2","3","4","5","6","7",
+ "8","9","10","11","12","13","14","15",
+ "16","17","18","19","20","21","22","23",
+ "24","25","26","27","28","29","30","31",
+ "32","33","34","35","36","37","38","39",
+ "40","41","42","43","44","45","46","47",
+ "48","49","50","AUTO"
+};
+
+#define max_osd_sound_vol_values 5
+const char * gb_osd_sound_vol_values[max_osd_sound_vol_values]={
+ "100%",
+ "75%",
+ "50%",
+ "25%",
+ "5%"
+};
+
 
 #define max_gb_value_binary_menu 2
 const char * gb_value_binary_menu[max_gb_value_binary_menu]={
- "0",
- "1"
+ "0 (OFF)",
+ "1 (ON)"
 };
 
 
 #define max_gb_speed_videoaudio_options_menu 5
 const char * gb_speed_videoaudio_options_menu[max_gb_speed_videoaudio_options_menu]={
  "Audio poll",
- "Video delay",
+ "CPU delay",
  "Skip Frame",
  "Keyboard poll",
  "Mouse poll"
@@ -121,8 +149,15 @@ const char * gb_speed_videoaudio_options_menu[max_gb_speed_videoaudio_options_me
 //};
 
 
-#define max_gb_osd_mouse_menu 2
+#define max_gb_osd_mouse_menu 3
 const char * gb_osd_mouse_menu[max_gb_osd_mouse_menu]={
+ "Mouse Detect",
+ "Mouse Buttons",
+ "Mouse Enabled"
+};
+
+#define max_gb_osd_mouse_buttons_menu 2
+const char * gb_osd_mouse_buttons_menu[max_gb_osd_mouse_buttons_menu]={
  "right handed",
  "left handed"
 };
@@ -144,32 +179,131 @@ const char * gb_reset_menu[max_gb_reset_menu]={
 
 #define gb_osd_max_rows 10
 
+
+//*************************************************************************************
+void SDLprintCharOSD(char car,int x,int y,unsigned char color,unsigned char backcolor)
+{ 
+// unsigned char aux = gb_sdl_font_6x8[(car-64)];
+ int auxId = car << 3; //*8
+ unsigned char aux;
+ unsigned char auxBit,auxColor;
+ for (unsigned char j=0;j<8;j++)
+ {
+  aux = gb_sdl_font_8x8[auxId + j];
+  for (int i=0;i<8;i++)
+  {
+   auxColor= ((aux>>i) & 0x01);
+   //SDLputpixel(surface,x+(6-i),y+j,(auxColor==1)?color:backcolor);
+   jj_fast_putpixel(x+(6-i),y+j,(auxColor==1)?color:backcolor);
+  }
+ }
+}
+
+void SDLprintText(const char *cad,int x, int y, unsigned char color,unsigned char backcolor)
+{
+//SDL_Surface *surface,
+// gb_sdl_font_6x8
+ int auxLen= strlen(cad);
+ if (auxLen>50)
+  auxLen=50;
+ for (int i=0;i<auxLen;i++)
+ {
+  SDLprintCharOSD(cad[i],x,y,color,backcolor);
+  x+=7;
+ }
+}
+
+
 void OSDMenuRowsDisplayScroll(const char **ptrValue,unsigned char currentId,unsigned char aMax)
 {//Dibuja varias lineas
- vga.setTextColor(WHITE,BLACK);
  for (int i=0;i<gb_osd_max_rows;i++)
- {
-  vga.setCursor(gb_pos_x_menu, gb_pos_y_menu+8+(i<<3));
-  vga.print("                    ");
- }
+  SDLprintText("                    ",gb_pos_x_menu,gb_pos_y_menu+8+(i<<3),0,0);
  
  for (int i=0;i<gb_osd_max_rows;i++)
  {
   if (currentId >= aMax)
-   break;
-  if (i == 0)
-   vga.setTextColor(CYAN,BLUE);
-  else
-   vga.setTextColor(WHITE,BLACK);
-  vga.setCursor(gb_pos_x_menu, gb_pos_y_menu+8+(i<<3));
-  vga.print(ptrValue[currentId]);
+   break;  
+  SDLprintText(ptrValue[currentId],gb_pos_x_menu,gb_pos_y_menu+8+(i<<3),((i==0)?ID_COLOR_WHITE:ID_COLOR_WHITE),((i==0)?ID_COLOR_MAGENTA:ID_COLOR_BLACK));
   currentId++;
  }     
+
+ 
+ //vga.setTextColor(WHITE,BLACK);
+ //for (int i=0;i<gb_osd_max_rows;i++)
+ //{
+ // vga.setCursor(gb_pos_x_menu, gb_pos_y_menu+8+(i<<3));
+ // vga.print("                    ");
+ //}
+ //
+ //for (int i=0;i<gb_osd_max_rows;i++)
+ //{
+ // if (currentId >= aMax)
+ //  break;
+ // if (i == 0)
+ //  vga.setTextColor(CYAN,BLUE);
+ // else
+ //  vga.setTextColor(WHITE,BLACK);
+ // vga.setCursor(gb_pos_x_menu, gb_pos_y_menu+8+(i<<3));
+ // vga.print(ptrValue[currentId]);
+ // currentId++;
+ //}     
 }
 
 //Maximo 256 elementos
 unsigned char ShowTinyMenu(const char *cadTitle,const char **ptrValue,unsigned char aMax)
 {
+ unsigned char aReturn=0;
+ unsigned char salir=0;
+ SDLClear();
+ SDLprintText("Port Cpcem(Tom Walker) by Ackerman",(gb_pos_x_menu-(32)),(gb_pos_y_menu-16),ID_COLOR_WHITE,ID_COLOR_BLACK);
+ //for (int i=0;i<20;i++) 
+ for (int i=0;i<14;i++) 
+  SDLprintCharOSD(' ',gb_pos_x_menu+(i<<3),gb_pos_y_menu,ID_COLOR_BLACK,ID_COLOR_WHITE);
+ SDLprintText(cadTitle,gb_pos_x_menu,gb_pos_y_menu,ID_COLOR_BLACK,ID_COLOR_WHITE);
+
+ OSDMenuRowsDisplayScroll(ptrValue,0,aMax);
+ 
+ while (salir == 0)
+ {             
+  //case SDLK_UP:
+  if (checkAndCleanKey(KEY_CURSOR_LEFT))
+  {
+   if (aReturn>10) aReturn-=10;
+   OSDMenuRowsDisplayScroll(ptrValue,aReturn,aMax);       
+  }
+  if (checkAndCleanKey(KEY_CURSOR_RIGHT))
+  {
+   if (aReturn<(aMax-10)) aReturn+=10;
+   OSDMenuRowsDisplayScroll(ptrValue,aReturn,aMax);       
+  }  
+  if (checkAndCleanKey(KEY_CURSOR_UP))
+  {
+   if (aReturn>0) aReturn--;
+   OSDMenuRowsDisplayScroll(ptrValue,aReturn,aMax);
+  }
+  if (checkAndCleanKey(KEY_CURSOR_DOWN))
+  {
+   if (aReturn < (aMax-1)) aReturn++;
+   OSDMenuRowsDisplayScroll(ptrValue,aReturn,aMax);
+  }
+  if (checkAndCleanKey(KEY_ENTER))
+  {
+   salir= 1;
+  }
+  //case SDLK_KP_ENTER: case SDLK_RETURN: salir= 1;break;
+  if (checkAndCleanKey(KEY_ESC))
+  {
+   salir=1; aReturn= 255;    
+  }
+  //case SDLK_ESCAPE: salir=1; aReturn= 255; break;
+  //default: break;    
+ }
+ gb_show_osd_main_menu= 0;
+ return aReturn;
+
+
+
+/*
  unsigned char aReturn=0;
  unsigned char salir=0;
  #ifdef use_lib_400x300
@@ -261,6 +395,7 @@ unsigned char ShowTinyMenu(const char *cadTitle,const char **ptrValue,unsigned c
  } 
  gb_show_osd_main_menu= 0;
  return aReturn;
+ */
 }
 
 //Menu SNA
@@ -268,15 +403,18 @@ void ShowTinyDSKMenu()
 {
  unsigned char aSelNum;     
  aSelNum = ShowTinyMenu("Machine DSK",gb_machine_menu,max_gb_machine_menu);
- if (aSelNum == 0)
+ if (aSelNum != 255)
  {
-  aSelNum = ShowTinyMenu("464 DSK",gb_list_dsk_title,max_list_dsk);  
-  loaddsk2Flash(aSelNum);
- }
- else
- {
-  aSelNum = ShowTinyMenu("6128 DSK",gb_list_dsk_title,max_list_dsk);                
-  loaddsk2Flash(aSelNum);  
+  if (aSelNum == 0)
+  {
+   aSelNum = ShowTinyMenu("464 DSK",gb_list_dsk_title,max_list_dsk);  
+   loaddsk2Flash(aSelNum);
+  }
+  else
+  {
+   aSelNum = ShowTinyMenu("6128 DSK",gb_list_dsk_title,max_list_dsk);                
+   loaddsk2Flash(aSelNum);  
+  }
  }         
 }
 
@@ -285,18 +423,21 @@ void ShowTinyMachineMenu()
 {
  //unsigned char aSelNum;
  model = ShowTinyMenu("Machine",gb_machine_menu,max_gb_machine_menu);
- loadroms2FlashModel();
- //switch (aSelNum)
- //{
- // case 0: model= 0; loadroms2FlashModel(0); break;
- // case 1: model= 1; loadroms2FlashModel(1); break;
- // case 2: model= 2; loadroms2FlashModel(2); break;
- // default: model= 0; loadroms2FlashModel(0); break;
- //}
- //vTaskDelay(2);
- resetz80();
- resetcrtc();
- //SDL_Delay(2);
+ if (model != 255)
+ {
+  loadroms2FlashModel();
+  //switch (aSelNum)
+  //{
+  // case 0: model= 0; loadroms2FlashModel(0); break;
+  // case 1: model= 1; loadroms2FlashModel(1); break;
+  // case 2: model= 2; loadroms2FlashModel(2); break;
+  // default: model= 0; loadroms2FlashModel(0); break;
+  //}
+  //vTaskDelay(2);
+  resetz80();
+  resetcrtc();
+  //SDL_Delay(2);
+ }
 }
 
 
@@ -304,12 +445,15 @@ void ShowTinyMachineMenu()
 void ShowTinyResetMenu()
 {
  unsigned char aSelNum;
- aSelNum= ShowTinyMenu("Reset",gb_reset_menu,max_gb_reset_menu);   
- loadroms2FlashModel();
- resetz80();
- resetcrtc(); 
- if (aSelNum == 1)
-  ESP.restart();
+ aSelNum= ShowTinyMenu("Reset",gb_reset_menu,max_gb_reset_menu);
+ if (aSelNum != 255)
+ {
+  loadroms2FlashModel();
+  resetz80();
+  resetcrtc(); 
+  if (aSelNum == 1)
+   ESP.restart();
+ }
 }
 
 //Menu TAPE
@@ -343,7 +487,7 @@ void ShowTinySCRMenu()
 void ShowTinySpeedMenu()
 {
  unsigned char aSelNum,aSelNumSpeed;
- aSelNum = ShowTinyMenu("SPEED VIDEO AUDIO",gb_speed_videoaudio_options_menu,max_gb_speed_videoaudio_options_menu);
+ aSelNum = ShowTinyMenu("SPEED CPU AUDIO",gb_speed_videoaudio_options_menu,max_gb_speed_videoaudio_options_menu);
  if (aSelNum == 255)
   return;
  switch (aSelNum)
@@ -351,27 +495,70 @@ void ShowTinySpeedMenu()
   case 0: aSelNumSpeed= ShowTinyMenu("AUDIO Poll ms",gb_speed_sound_menu,max_gb_speed_sound_menu);
    if (aSelNumSpeed == 255)
     return;
-   gb_current_ms_poll_sound= (aSelNumSpeed<<1); //Multiplico x2
+   gb_current_ms_poll_sound= aSelNumSpeed;
    break;
-  case 1: aSelNumSpeed= ShowTinyMenu("Video DELAY ms",gb_speed_sound_menu,max_gb_speed_sound_menu);
+  case 1: aSelNumSpeed= ShowTinyMenu("CPU DELAY ms",gb_speed_sound_menu,max_gb_speed_sound_menu);
    if (aSelNumSpeed == 255)
     return;
-   gb_current_delay_emulate_ms = (aSelNumSpeed<<1);
+   if (aSelNumSpeed == 51){
+    gb_auto_delay_cpu= 1;  
+    gb_current_delay_emulate_ms = 1; //Revisar condicion execute main cpu
+   }
+   else{
+    gb_auto_delay_cpu= 0;
+    gb_current_delay_emulate_ms = aSelNumSpeed;
+   }
    break;
-  case 2: gb_current_frame_crt_skip = ShowTinyMenu("Skip Frame",gb_value_binary_menu,max_gb_value_binary_menu);
+  case 2: 
+   aSelNumSpeed = ShowTinyMenu("Skip Frame",gb_value_binary_menu,max_gb_value_binary_menu);
+   switch (aSelNumSpeed)
+   {
+    case 0: gb_current_frame_crt_skip = 0; break;
+    case 1: gb_current_frame_crt_skip = 1; break;
+    default: break;
+   }
    break;
   case 3: aSelNumSpeed= ShowTinyMenu("Keyboard Poll ms",gb_speed_sound_menu,max_gb_speed_sound_menu);
    if (aSelNumSpeed == 255)
     return;
-   gb_current_ms_poll_keyboard= (aSelNumSpeed<<1);
+   gb_current_ms_poll_keyboard= aSelNumSpeed;
    break;
   case 4: aSelNumSpeed= ShowTinyMenu("Mouse Poll ms",gb_speed_sound_menu,max_gb_speed_sound_menu);
    if (aSelNumSpeed == 255)
     return;   
-   gb_current_ms_poll_mouse= (aSelNumSpeed<<1);
+   gb_current_ms_poll_mouse= aSelNumSpeed;
    break;      
   default: break;
  }
+}
+
+//Activar desactivar sonido
+void ShowTinySoundMenu()
+{
+ unsigned char aSelNum,aSelSoundON,aSelVol;
+ aSelNum = ShowTinyMenu("SOUND MENU",gb_osd_sound_menu,max_gb_osd_sound_menu); 
+ switch (aSelNum)
+ {
+  case 0:
+   aSelSoundON = ShowTinyMenu("SOUND ENABLED",gb_value_binary_menu,max_gb_value_binary_menu); 
+   #ifdef use_lib_sound_ay8912
+    switch (aSelSoundON)
+    {
+     case 0: gb_mute_sound=1; break;
+     case 1: gb_mute_sound=0; break;
+     default: break;
+    }
+   #endif
+   break;
+  case 1:
+   aSelVol = ShowTinyMenu("SOUND VOLUME",gb_osd_sound_vol_values,max_osd_sound_vol_values);
+   #ifdef use_lib_sound_ay8912
+    gbShiftLeftVolumen= aSelVol;
+   #endif 
+   break;
+  default: break;
+ }
+
 }
 
 
@@ -382,9 +569,14 @@ void ShowTinyScreenAdjustMenu()
 {
  unsigned char aSelNum, auxCol; 
  aSelNum= ShowTinyMenu("Screen Adjust",gb_osd_screen,max_gb_osd_screen);
+ if (auxCol == 255)
+  return;
  auxCol= ShowTinyMenu("Pixels",gb_osd_screen_values,max_gb_osd_screen_values);
- auxCol = auxCol<<1; //x2
- gb_screen_xOffset = auxCol; 
+ if (auxCol != 255)
+ {
+  auxCol = auxCol<<1; //x2
+  gb_screen_xOffset = auxCol; 
+ }
  /*switch (aSelNum)
  {
   case 2:
@@ -450,17 +642,41 @@ void ShowTinyScreenAdjustMenu()
 
 void ShowTinyMouseMenu()
 {
- #ifdef use_lib_amx_mouse    
-  unsigned char aSelNum;
-  aSelNum = ShowTinyMenu("Mouse Buttons",gb_osd_mouse_menu,max_gb_osd_mouse_menu); 
+ #ifdef use_lib_amx_mouse
+  unsigned char aSelNum,aSelBtn,aSelMouseEnabled;
+  aSelNum = ShowTinyMenu("Mouse",gb_osd_mouse_menu,max_gb_osd_mouse_menu);   
   switch (aSelNum)
   {
-   case 0: gb_force_left_handed= 0; break; //diestro
-   case 1: gb_force_left_handed= 1; break; //zurdo
+   case 0:
+    #ifdef use_lib_amx_mouse
+     gb_mouse_init_error= 0;
+    #endif 
+    break; //Init Detectar raton
+   case 1:
+    aSelBtn = ShowTinyMenu("Mouse buttons",gb_osd_mouse_buttons_menu,max_gb_osd_mouse_buttons_menu);
+    switch (aSelBtn)
+    {
+     case 0: gb_force_left_handed= 0; break; //diestro
+     case 1: gb_force_left_handed= 1; break; //zurdo
+     default: break;
+    }    
+    //gb_force_left_handed= 1; 
+    break; //zurdo
+   case 2:
+    aSelMouseEnabled = ShowTinyMenu("Mouse Enabled",gb_value_binary_menu,max_gb_value_binary_menu);
+    #ifdef use_lib_amx_mouse
+     switch (aSelMouseEnabled)
+     {
+      case 0: gb_mouse_init_error= 1; break; //Error 0 usa mouse
+      case 1: gb_mouse_init_error= 0; break; //Error 1 apaga mouse
+      default: break;
+     }
+    #endif
+    break;
    default: break;
   }
  #endif
- vTaskDelay(2);
+ //vTaskDelay(2);
 }
 
 
@@ -496,7 +712,8 @@ void do_tinyOSD()
    case 2: ShowTinySpeedMenu(); break;
    case 3: ShowTinyScreenAdjustMenu(); break;
    case 4: ShowTinyMouseMenu(); break;
-   case 5: ShowTinyResetMenu(); break; 
+   case 5: ShowTinySoundMenu(); break;
+   case 6: ShowTinyResetMenu(); break; 
     //resetz80();
     //resetcrtc();
     //SDL_Delay(2);
@@ -507,8 +724,9 @@ void do_tinyOSD()
    default: break;
   }
  }
- #ifdef use_lib_sound_ay8912
-  gb_silence_all_channels = 0;
+ #ifdef use_lib_sound_ay8912  
+  //gb_silence_all_channels = 0; 
+  gb_silence_all_channels = gb_mute_sound;
  #endif 
 }
 

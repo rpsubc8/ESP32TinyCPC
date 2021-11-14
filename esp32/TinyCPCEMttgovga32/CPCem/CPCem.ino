@@ -9,52 +9,112 @@
 // VGA library bitluni 0.3.3 (include)
 // gbConfig options configuration compile
 
-#include "Emulator/Keyboard/PS2Kbd.h"
+//Antes
+//RAM:   [=         ]   8.8% (used 28912 bytes from 327680 bytes)
+//Flash: [========  ]  81.6% (used 2567034 bytes from 3145728 bytes)
+#include "gbConfig.h"
+
+#include "PS2Kbd.h"
 #include <Arduino.h>
-#include "PS2Boot/PS2KeyCode.h"
+#include "PS2KeyCode.h"
 //Para ahorrar memoria
 //JJ #include <esp_bt.h>
 
-#include "gbConfig.h"
-
 #ifdef use_lib_amx_mouse
- #include "fabgl.h" //Para fabgl
- #include "WiFiGeneric.h"; //Fix WiFiGeneric.h No such file or directory
+ //mouse #include "fabgl.h" //Para fabgl ya no necesito
+ //mouse #include "WiFiGeneric.h"; //Fix WiFiGeneric.h No such file or directory
+ #include "PS2Mouse.h"
 #endif
 
 #ifdef use_lib_sound_ay8912
  #include "fabgl.h" //Para fabgl
  #include "fabutils.h" //Para fabgl
- #include "WiFiGeneric.h"
+ //#include "WiFiGeneric.h" //Quitar para dependencia al compilar
 #endif 
 
 #include "CPCem.h"
-#include "MartianVGA.h"
-#include "def/Font.h"
-#include "def/hardware.h"
-#include "driver/timer.h"
-#include "soc/timer_group_struct.h"
+//#ifdef use_lib_tinybitluni_fast
+//#else
+// #include "MartianVGA.h"
+// //#include "Font.h"
+//#endif 
+#include "hardware.h"
+//#include "driver/timer.h"
+//#include "soc/timer_group_struct.h"
 
-#include "CRTC.h"
-#include "FDC.h"
-#include "PSG.h"
-#include "Z80.h"
-#include "gb_globals.h"
-#include "osd.h"
+ #include "CRTC.h"
+ #include "FDC.h"
+ #include "PSG.h"
+ #include "Z80.h"
+ #include "gbGlobals.h"
+ #include "osd.h"
 
-#ifdef COLOR_3B
- #ifdef use_lib_vga_low_memory
-  VGA3BitI vga; 
+ #include "vga_6bit.h"
+
+ #ifdef use_lib_vga8colors
+  //DAC 3 bits 8 colores
+  // 3 bit pins  
+ static const unsigned char pin_config[] = {  
+  PIN_RED_HIGH,
+  PIN_GREEN_HIGH,  
+  PIN_BLUE_HIGH,
+  255,
+  255,
+  255,
+  PIN_HSYNC,
+  PIN_VSYNC
+ };
  #else
-  VGA3Bit vga;
- #endif 
-#else
- #ifdef use_lib_vga_low_memory
-  VGA6BitI vga;
- #else
-  VGA6Bit vga;
+  //DAC 6 bits 64 colores
+  static const unsigned char pin_config[] = {
+   PIN_RED_LOW,
+   PIN_RED_HIGH,
+   PIN_GREEN_LOW,
+   PIN_GREEN_HIGH,
+   PIN_BLUE_LOW,
+   PIN_BLUE_HIGH,
+   PIN_HSYNC,
+   PIN_VSYNC
+  };
  #endif
-#endif
+ 
+
+ //8 colores 3 bits
+ //vga.init(vga.MODE200x150, RED_PIN_3B, GRE_PIN_3B, BLU_PIN_3B, HSYNC_PIN, VSYNC_PIN);       
+ // 3 bit pins
+ // RED_PIN_3B 22
+ // GRE_PIN_3B 19
+ // BLU_PIN_3B 5
+ //static const unsigned char pin_config[] = {  
+ // PIN_RED_HIGH,
+ // PIN_GREEN_HIGH,  
+ // PIN_BLUE_HIGH,
+ // 255,
+ // 255,
+ // 255,
+ // PIN_HSYNC,
+ // PIN_VSYNC
+ //};
+
+ unsigned char gb_sync_bits;
+
+//#ifdef use_lib_tinybitluni_fast
+// unsigned char gb_sync_bits;
+//#else
+// #ifdef COLOR_3B
+//  #ifdef use_lib_vga_low_memory
+//   VGA3BitI vga; 
+//  #else
+//   VGA3Bit vga;
+//  #endif 
+// #else
+//  #ifdef use_lib_vga_low_memory
+//   VGA6BitI vga;
+//  #else
+//   VGA6Bit vga;
+//  #endif
+// #endif
+//#endif 
 
 #ifdef use_lib_amx_mouse
  //short int gb_sdl_mouse_x;
@@ -63,6 +123,7 @@
  //short int gb_sdl_mouse_y_before; 
  //unsigned char gb_auxMouseBtn;
  //unsigned char gb_auxMouseBtn_before;
+ unsigned char gb_mouse_init_error=0;
  unsigned char gb_mouse_key_btn_left=1;
  unsigned char gb_mouse_key_btn_right=1;
  unsigned char gb_mouse_key_left=1;
@@ -74,41 +135,69 @@
  #else
   unsigned char gb_force_left_handed=0; 
  #endif
- fabgl::PS2Controller PS2Controller;
+ //mouse fabgl::PS2Controller PS2Controller;
+ unsigned char gb_mouse_ps2clk;
+ unsigned char gb_mouse_ps2data;
 #endif 
+
+unsigned int tiempo_ini_cpu,tiempo_fin_cpu;
+unsigned int total_tiempo_ms_cpu;
+unsigned int tiene_que_tardar;
+#ifdef use_lib_measure_time
+ unsigned int jj_ini_cpu,jj_end_cpu;
+ unsigned int gb_max_cpu_ticks,gb_min_cpu_ticks,gb_cur_cpu_ticks;
+ unsigned int gb_cpu_timer_before=0,gb_cpu_timer_cur=0;
+#endif 
+
 
 unsigned char gb_run_emulacion = 1; //Ejecuta la emulacion
 unsigned char gb_current_ms_poll_sound = gb_ms_sound;
 unsigned char gb_current_ms_poll_keyboard = gb_ms_keyboard;
 unsigned char gb_current_ms_poll_mouse = gb_ms_mouse;
 unsigned char gb_current_frame_crt_skip= gb_frame_crt_skip; //No salta frames
-unsigned char gb_current_delay_emulate_ms= gb_delay_emulate_ms;
+unsigned char gb_current_delay_emulate_ms= (gb_auto_delay_cpu==1)?1:gb_delay_emulate_ms;
+unsigned char gb_auto_delay_cpu= use_lib_delay_tick_cpu_auto;
 unsigned char gb_sdl_blit=0;
 unsigned char gb_screen_xOffset=0;
-static unsigned long gb_time_ini_espera;
+static unsigned int gb_time_ini_espera;
 
 //volatile unsigned char keymap[256];
 //volatile unsigned char oldKeymap[256];
 //unsigned char *ramArray[8];
-static unsigned long gb_currentTime;
-static unsigned long gb_keyboardTime;
-static unsigned long gb_mouseTime;
+static unsigned int gb_currentTime;
+static unsigned int gb_keyboardTime;
+static unsigned int gb_mouseTime;
 unsigned char *ram;
+
+ #ifdef use_lib_mem_blocks
+  static unsigned char gb_ram_static_0[0x10000]; //64 KB ram static ram0
+ #else
+  #ifdef use_lib_cheat_128k
+  #else
+   #ifdef use_lib_fix_psram_128k
+   #else
+    static unsigned char gb_ram_static_0[0x10000]; //64 KB ram static ram0
+   #endif 
+  #endif 
+ #endif 
+
 #ifdef use_lib_mem_blocks
  unsigned char *ramArray[2]; //2 bloques de 64 KB
 #endif
 //unsigned char gb_sdl_current_frame=0;
-#ifdef use_lib_ultrafast_vga
- unsigned char ** ptrVGA;
-#endif
+
+
+unsigned char **gb_buffer_vga;
+unsigned int **gb_buffer_vga32;
+
 
 //JJ unsigned char gb_sdl_blit=0;//solo necesito en pc
 unsigned char model;
 //JJ int soundavail=1; //no necesito
 //JJ char discname[260]="";//no lo necesito
 //JJ int quit; //no lo necesito
-int soundon;
-int spdc=0;
+unsigned char soundon;
+//int spdc=0; //no lo necesito
 
 #ifdef use_lib_sound_ay8912
  SoundGenerator soundGenerator;
@@ -118,10 +207,13 @@ int spdc=0;
  unsigned char gbVolMixer_now[3]={0,0,0};
  unsigned short int gbFrecMixer_now[3]={0,0,0}; 
  unsigned char gb_silence_all_channels=1; 
- static unsigned long gb_sdl_time_sound_before;
+ unsigned char gbShiftLeftVolumen=0; //Maximo volumen shift left 2
+ unsigned char gb_mute_sound=0;
+ static unsigned int gb_sdl_time_sound_before;
   
  void sound_cycleFabgl(void);
  void jj_mixpsg(void);
+ void SilenceAllChannels(void);
 #endif
 
 #ifdef use_lib_sound_ay8912
@@ -143,7 +235,17 @@ int spdc=0;
   {
    if (gbVolMixer_now[i] != gbVolMixer_before[i])
    {
-    gb_sineArray[i].setVolume((gbVolMixer_now[i]<<2));
+    //gb_sineArray[i].setVolume((gbVolMixer_now[i]<<2));    
+    switch (gbShiftLeftVolumen)
+    {
+      case 0: gb_sineArray[i].setVolume((gbVolMixer_now[i]<<2)); break;
+      case 1: gb_sineArray[i].setVolume((gbVolMixer_now[i]<<1)); break;
+      case 2: gb_sineArray[i].setVolume((gbVolMixer_now[i])); break;
+      case 3: gb_sineArray[i].setVolume((gbVolMixer_now[i]>>1)); break;
+      case 4: gb_sineArray[i].setVolume((gbVolMixer_now[i]>>2)); break;
+      default: gb_sineArray[i].setVolume((gbVolMixer_now[i]<<2)); break;
+    }
+    
     gbVolMixer_before[i] = gbVolMixer_now[i];
    }
    if (gbFrecMixer_now[i] != gbFrecMixer_before[i])
@@ -367,6 +469,21 @@ void SDL_keys_poll()
 
 void PollMouse(void)
 {
+ unsigned char stat;
+ signed short int x,y;
+ PS2Mouse_getPosition(stat,x,y);
+ gb_mouse_key_right = gb_mouse_key_left= gb_mouse_key_down = gb_mouse_key_up = 1;
+ 
+ //Botones
+ gb_mouse_key_btn_left = ((stat & 0x01) == 0x01)?0:1;
+ gb_mouse_key_btn_right = ((stat & 0x02) == 0x02)?0:1;
+
+ //Delta
+ gb_mouse_key_right= (x > 0)?0:1;   
+ gb_mouse_key_left = (x < 0)?0:1;
+ gb_mouse_key_down = (y < 0)?0:1;
+ gb_mouse_key_up = (y > 0 )?0:1;      
+/*  fabgl ya no lo necesito
  auto mouse = PS2Controller.mouse();
  //cpckeys[9][4]= 1;
  //cpckeys[9][5]= 1;
@@ -387,21 +504,22 @@ void PollMouse(void)
 
   gb_mouse_key_btn_left = (mouseDelta.buttons.left)?0:1;
   gb_mouse_key_btn_right = (mouseDelta.buttons.right)?0:1;
-
-  /*if (mouseDelta.buttons.left)     
-   SDL_keys_mouse_set_btnLeft(0);  
-  else
-   SDL_keys_mouse_set_btnLeft(1);
-
-  if (mouseDelta.buttons.right)
-   SDL_keys_mouse_set_btnRight(0);
-  else
-   SDL_keys_mouse_set_btnRight(1);
-   
-  cpckeys[9][3]= (mouseDelta.deltaX > 0)?0:1;       
-  cpckeys[9][2] = (mouseDelta.deltaX < 0)?0:1;
-  cpckeys[9][1] = (mouseDelta.deltaY < 0)?0:1;
-  cpckeys[9][0] = (mouseDelta.deltaY > 0 )?0:1; */
+  
+  //if (mouseDelta.buttons.left)     
+  // SDL_keys_mouse_set_btnLeft(0);  
+  //else
+  // SDL_keys_mouse_set_btnLeft(1);
+  //
+  //if (mouseDelta.buttons.right)
+  // SDL_keys_mouse_set_btnRight(0);
+  //else
+  // SDL_keys_mouse_set_btnRight(1);
+  // 
+  //cpckeys[9][3]= (mouseDelta.deltaX > 0)?0:1;       
+  //cpckeys[9][2] = (mouseDelta.deltaX < 0)?0:1;
+  //cpckeys[9][1] = (mouseDelta.deltaY < 0)?0:1;
+  //cpckeys[9][0] = (mouseDelta.deltaY > 0 )?0:1; 
+  
 
   gb_mouse_key_right= (mouseDelta.deltaX > 0)?0:1;       
   gb_mouse_key_left = (mouseDelta.deltaX < 0)?0:1;
@@ -417,7 +535,7 @@ void PollMouse(void)
  //cpckeys[9][2] &= gb_mouse_key_left;
  //cpckeys[9][1] &= gb_mouse_key_down;
  //cpckeys[9][0] &= gb_mouse_key_up;
-
+*/
 }
 #endif
 
@@ -431,7 +549,8 @@ void setup()
  #ifdef use_lib_mem_blocks
   //for (int i=0;i<2;i++)
   // ramArray[i] = (unsigned char *)calloc(0x10000,1);//64KB+16KB fix error
-  ramArray[0] = (unsigned char *)calloc(0x10000,1);//64KB+16KB fix error
+  //ramArray[0] = (unsigned char *)calloc(0x10000,1);//64KB+16KB fix error
+  ramArray[0] = gb_ram_static_0;//64KB+16KB fix error
   ramArray[1] = (unsigned char *)calloc(0x10000,1);//64KB
   ram = ramArray[0]; 
  #else
@@ -443,7 +562,8 @@ void setup()
     ram=(unsigned char *)ps_malloc(0x20000); //Modo 128K psram
     memset(ram,1,0x20000);
    #else
-    ram=(unsigned char *)malloc(0x10000); //Modo 64K
+    //ram=(unsigned char *)malloc(0x10000); //Modo 64K
+    ram = gb_ram_static_0; //64 KB en RAM0
     memset(ram,1,0x10000);
    #endif 
   #endif 
@@ -465,44 +585,75 @@ void setup()
   Serial.printf("RAM %d\n", ESP.getFreeHeap()); 
  #endif
 
- #ifdef COLOR_3B
+
+ //#ifdef use_lib_tinybitluni_fast
   #ifdef use_lib_400x300
-   vga.init(vga.MODE400x300, RED_PIN_3B, GRE_PIN_3B, BLU_PIN_3B, HSYNC_PIN, VSYNC_PIN);       
+   vga_init(pin_config,VgaMode_vga_mode_400x300,false); //Llamada en C   
   #else
-   vga.init(vga.MODE320x200, RED_PIN_3B, GRE_PIN_3B, BLU_PIN_3B, HSYNC_PIN, VSYNC_PIN);    
-  #endif
- #else
-  const int redPins[] = {RED_PINS_6B};
-  const int grePins[] = {GRE_PINS_6B};
-  const int bluPins[] = {BLU_PINS_6B}; 
-  #ifdef use_lib_400x300
-   vga.init(vga.MODE400x300, redPins, grePins, bluPins, HSYNC_PIN, VSYNC_PIN);   
-  #else
-   vga.init(vga.MODE320x200, redPins, grePins, bluPins, HSYNC_PIN, VSYNC_PIN);
+   //vga_init(pin_config,VgaMode_vga_mode_400x300,false); //Llamada en C
+   vga_init(pin_config,VgaMode_vga_mode_320x200,false); //Llamada en C   
   #endif 
- #endif
- #ifdef use_lib_ultrafast_vga  
-  PrepareColorsUltraFastVGA();  
- #endif 
- vga.setFont(Font6x8);
- vga.clear(BLACK); 
- #ifdef use_lib_ultrafast_vga
-  #ifdef use_lib_400x300
-   vga.fillRect(0,0,400,300,BLACK);
-   vga.fillRect(0,0,400,300,BLACK);//fix mode fast video
-  #else
-   vga.fillRect(0,0,320,200,BLACK);
-   vga.fillRect(0,0,320,200,BLACK);//fix mode fast video
-  #endif 
-  ptrVGA = vga.backBuffer; //Asignamos  puntero buffer
- #endif  
+ //#else
+ // #ifdef COLOR_3B
+ //  #ifdef use_lib_400x300
+ //   vga.init(vga.MODE400x300, RED_PIN_3B, GRE_PIN_3B, BLU_PIN_3B, HSYNC_PIN, VSYNC_PIN);       
+ //  #else
+ //   vga.init(vga.MODE320x200, RED_PIN_3B, GRE_PIN_3B, BLU_PIN_3B, HSYNC_PIN, VSYNC_PIN);    
+ //  #endif
+ // #else
+ //  const int redPins[] = {RED_PINS_6B};
+ //  const int grePins[] = {GRE_PINS_6B};
+ //  const int bluPins[] = {BLU_PINS_6B}; 
+ //  #ifdef use_lib_400x300
+ //   vga.init(vga.MODE400x300, redPins, grePins, bluPins, HSYNC_PIN, VSYNC_PIN);   
+ //  #else
+ //   vga.init(vga.MODE320x200, redPins, grePins, bluPins, HSYNC_PIN, VSYNC_PIN);
+ //  #endif 
+ // #endif
+ //#endif
+ 
+ gb_sync_bits= vga_get_sync_bits();
+ gb_buffer_vga = vga_get_framebuffer();
+ gb_buffer_vga32=(unsigned int **)gb_buffer_vga;
+ PrepareColorsUltraFastVGA(); //Llamar despues de tener gb_sync_bits
+ SDLClear();
+ //#ifdef use_lib_ultrafast_vga  
+ // PrepareColorsUltraFastVGA();  
+ //#endif
+ //vga.setFont(Font6x8);
+ //vga.clear(BLACK); 
+ //#ifdef use_lib_tinybitluni_fast  
+ // gb_sync_bits= vga_get_sync_bits();
+ // gb_buffer_vga = vga_get_framebuffer();
+ // gb_buffer_vga32=(unsigned int **)gb_buffer_vga;  
+ //#else
+ // gb_buffer_vga = vga.backBuffer; //Asignamos  puntero buffer
+ //#endif 
+ //SDLClear();
+ //#ifdef use_lib_ultrafast_vga
+ // #ifdef use_lib_400x300
+ //  //vga.fillRect(0,0,400,300,BLACK);
+ //  //vga.fillRect(0,0,400,300,BLACK);//fix mode fast video
+ //  SDLClear();
+ // #else
+ //  //vga.fillRect(0,0,320,200,BLACK);
+ //  //vga.fillRect(0,0,320,200,BLACK);//fix mode fast video
+ //  SDLClear();
+ // #endif   
+ //#endif  
 
  #ifdef use_lib_log_serial
   Serial.printf("VGA %d\n", ESP.getFreeHeap()); 
  #endif
 
  #ifdef use_lib_amx_mouse   
-  PS2Controller.begin();
+  //mouse PS2Controller.begin();
+  delay(gb_delay_init_ms); //Espera 1 segundo para detectar
+  gb_mouse_init_error=0;
+  pinMode(MOUSE_CLK, OUTPUT);
+  pinMode(MOUSE_DATA, INPUT);
+  PS2Mouse_Init(MOUSE_CLK,MOUSE_DATA); //Inicializa raton
+  PS2Mouse_begin();
  #endif 
 
  kb_begin();
@@ -517,6 +668,9 @@ void setup()
  loaddsk2Flash(0);
 
  gb_keyboardTime = gb_currentTime = millis();
+ #ifdef use_lib_measure_time
+  gb_cpu_timer_before= gb_cpu_timer_cur= gb_keyboardTime;
+ #endif 
  #ifdef use_lib_amx_mouse
   gb_mouseTime = gb_keyboardTime;
  #endif
@@ -559,8 +713,11 @@ void loop()
  #ifdef use_lib_amx_mouse
   if ((gb_currentTime-gb_mouseTime) >= gb_current_ms_poll_mouse)
   {
-   gb_mouseTime = gb_currentTime;  
-   PollMouse();
+   gb_mouseTime = gb_currentTime;
+   if (gb_mouse_init_error == 0)
+   {
+    PollMouse();
+   }
   }
  #endif
 
@@ -573,11 +730,37 @@ void loop()
 
  if ((gb_current_delay_emulate_ms == 0) || (gb_run_emulacion == 1))
  {     
-  cpuline=0;
-  execz80();
+  #ifdef use_lib_measure_time  
+   tiempo_ini_cpu= millis();
+   jj_ini_cpu = micros();
+
+   cpuline=0;
+   execz80();
+
+   jj_end_cpu = micros();
+   tiempo_fin_cpu = millis();
+   total_tiempo_ms_cpu=tiempo_fin_cpu-tiempo_ini_cpu;
+
+   gb_cur_cpu_ticks= (jj_end_cpu-jj_ini_cpu);
+   if (gb_cur_cpu_ticks>gb_max_cpu_ticks)
+    gb_max_cpu_ticks= gb_cur_cpu_ticks;
+   if (gb_cur_cpu_ticks<gb_min_cpu_ticks)   
+    gb_min_cpu_ticks= gb_cur_cpu_ticks;
+  #else
+   tiempo_ini_cpu= millis();
+   cpuline=0;
+   execz80();
+   tiempo_fin_cpu = millis();
+   total_tiempo_ms_cpu=tiempo_fin_cpu-tiempo_ini_cpu; //Deberia ser 20 milis
+   tiene_que_tardar= 20-total_tiempo_ms_cpu;
+   if (tiene_que_tardar>20){
+    tiene_que_tardar=0;
+   }   
+  #endif 
  }
 
- if (gb_current_delay_emulate_ms != 0)
+ 
+ if ((gb_current_delay_emulate_ms != 0)||(gb_auto_delay_cpu == 1))
  {
   if (gb_sdl_blit == 1)
   {
@@ -602,13 +785,43 @@ void loop()
   }
  #endif   
 
- if (gb_current_delay_emulate_ms != 0)
+ if ((gb_current_delay_emulate_ms != 0)||(gb_auto_delay_cpu == 1))
  {
   gb_currentTime = millis();     
-  if (gb_run_emulacion == 0)  
-   if ((gb_currentTime - gb_time_ini_espera) >= gb_current_delay_emulate_ms)   
-    gb_run_emulacion = 1;     
+  if (gb_run_emulacion == 0)
+  {
+   if (gb_auto_delay_cpu == 1)
+   {
+    if ((gb_currentTime - gb_time_ini_espera) >= tiene_que_tardar){
+     gb_run_emulacion = 1;
+    }
+   }
+   else
+   {
+    if ((gb_currentTime - gb_time_ini_espera) >= gb_current_delay_emulate_ms){  
+     gb_run_emulacion = 1;
+    }
+   }
+  }
  }
+
+ #ifdef use_lib_measure_time
+  gb_cpu_timer_cur= millis();
+  if ((gb_cpu_timer_cur-gb_cpu_timer_before)<1000)
+  {   
+  }
+  else
+  {
+   gb_cpu_timer_before= gb_cpu_timer_cur;
+   //Imprimo CPU
+   Serial.printf("c:%u m:%u mx:%u\n",gb_cur_cpu_ticks,gb_min_cpu_ticks,gb_max_cpu_ticks);   
+
+   //Reseteo CPU a 1 segundo
+   gb_min_cpu_ticks= 1000000;
+   gb_max_cpu_ticks= 0;
+   gb_cur_cpu_ticks= 0;   
+  }  
+ #endif
  
  //videoTaskNoThread(); 
 }

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "CPCem.h"
 #include "PSG.h"
-#include "gb_globals.h"
+#include "gbGlobals.h"
 
 unsigned char psgdat;
 unsigned char psgmode;

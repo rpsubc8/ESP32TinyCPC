@@ -2,7 +2,7 @@
 #include "string.h"
 #include "CRTC.h"
 #include "CPCem.h"
-#include "gb_globals.h"
+#include "gbGlobals.h"
 
 int crtcvsync;
 int linessincevsync=0;
@@ -103,7 +103,8 @@ void resetcrtc()
  vc=sc=crtcline=vsyncpulse=0;
 }
 
-static unsigned long look2bpp[256];
+//JJ static unsigned long look2bpp[256];
+static unsigned int look2bpp[256];
 //,look2bpph[256][2];
 
 /*void ImprimeTablaPrecalculadaCRT()
@@ -144,48 +145,113 @@ void makelookup()
 }
 */
 
+#ifdef use_lib_vga8colors
+//8 colores
+static unsigned char gb_const_colorNormal35[35]={
+ BLACK, BLUE, BLUE, GREEN, YELLOW, BLUE, MAGENTA, BLUE,
+ RED, MAGENTA, YELLOW, YELLOW, WHITE, RED, CYAN, RED,
+ MAGENTA, BLUE, GREEN, GREEN, CYAN, BLACK, BLUE, GREEN,
+ BLUE, MAGENTA, GREEN, GREEN, CYAN, RED, MAGENTA, GREEN,
+ MAGENTA, BLUE, BLACK
+};
+#else
+//64 colores
+static unsigned char gb_const_colorNormal35[35]={
+  0,21,21,29,31,16,35,20,
+  23,35,47,15,63,3,60,7,
+  59,16,28,12,61,0,48,4,
+  36,17,29,14,62,1,49,5,
+  58,42,21
+ //Prueba tiny bitluni  
+ //BLACK, BLUE, BLUE, GREEN, YELLOW, BLUE, MAGENTA, BLUE,
+ //RED, MAGENTA, YELLOW, YELLOW, WHITE, RED, CYAN, RED,
+ //MAGENTA, BLUE, GREEN, GREEN, CYAN, BLACK, BLUE, GREEN,
+ //BLUE, MAGENTA, GREEN, GREEN, CYAN, RED, MAGENTA, GREEN,
+ //MAGENTA, BLUE, BLACK 
+};
+#endif
+
+
+
 
 void remakelookup()
 {
-        int c,d,e;
-        //switch (scrmode|((resolution)?4:0))
-        switch (scrmode)
-        {
-                case 0:
-                for (c=0;c<256;c++)
-                {
-                        look2bpp[c]=0;
-                        d=((c&1)<<3) | ((c&4)>>1) | ((c&0x10)>>2) | ((c&0x40)>>6);
-                        look2bpp[c]|=gapal[d]<<16;
-                        e=c>>1;
-                        d=((e&1)<<3) | ((e&4)>>1) | ((e&0x10)>>2) | ((e&0x40)>>6);
-                        look2bpp[c]|=gapal[d];
-                        look2bpp[c]|=(look2bpp[c]<<8);
-                }
-                break;
-                case 1:
-                for (c=0;c<256;c++)
-                {
-                        look2bpp[c]=0;
-                        d=((c&1)<<1)|((c&0x10)>>4);
-                        look2bpp[c]|=gapal[d]<<24;
-                        d=(((c&2)<<1)|((c&0x20)>>4))>>1;
-                        look2bpp[c]|=gapal[d]<<16;
-                        d=(((c&4)<<1)|((c&0x40)>>4))>>2;
-                        look2bpp[c]|=gapal[d]<<8;
-                        d=(((c&8)<<1)|((c&0x80)>>4))>>3;
-                        look2bpp[c]|=gapal[d];
-                }
-                break;
-                case 2:
-                for (c=0;c<256;c++)
-                {
-                        look2bpp[c]=gapal[c&1]<<24;
-                        look2bpp[c]|=gapal[(c>>2)&1]<<16;
-                        look2bpp[c]|=gapal[(c>>4)&1]<<8;
-                        look2bpp[c]|=gapal[(c>>6)&1];
-                }
-                break;
+ int c,d,e;
+ unsigned int pixel,a0,a1,a2,a3,a32;
+ //switch (scrmode|((resolution)?4:0))
+ switch (scrmode)
+ {
+  case 0:
+   for (c=0;c<256;c++)
+   {
+    look2bpp[c]=0;
+    d=((c&1)<<3) | ((c&4)>>1) | ((c&0x10)>>2) | ((c&0x40)>>6);
+    look2bpp[c]|=gapal[d]<<16;
+    e=c>>1;
+    d=((e&1)<<3) | ((e&4)>>1) | ((e&0x10)>>2) | ((e&0x40)>>6);
+    look2bpp[c]|=gapal[d];
+    look2bpp[c]|=(look2bpp[c]<<8);
+
+    #ifdef use_lib_320x200_video_border
+    #else
+     //Ordenamos y asignamos DMA 32 bits
+     pixel= look2bpp[c];
+     a0= gb_const_colorNormal35[(pixel & 0x000000FF)];
+     a1= gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
+     a2= gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+     a3 = gb_const_colorNormal35[((pixel>>24) & 0x000000FF)];
+     a32= a2 | (a3<<8) | (a0<<16) | (a1<<24);
+     look2bpp[c] = a32;
+    #endif
+   }
+   break;
+  case 1:
+   for (c=0;c<256;c++)
+   {
+    look2bpp[c]=0;
+    d=((c&1)<<1)|((c&0x10)>>4);
+    look2bpp[c]|=gapal[d]<<24;
+    d=(((c&2)<<1)|((c&0x20)>>4))>>1;
+    look2bpp[c]|=gapal[d]<<16;
+    d=(((c&4)<<1)|((c&0x40)>>4))>>2;
+    look2bpp[c]|=gapal[d]<<8;
+    d=(((c&8)<<1)|((c&0x80)>>4))>>3;
+    look2bpp[c]|=gapal[d];
+
+    #ifdef use_lib_320x200_video_border
+    #else
+     //Ordenamos y asignamos DMA 32 bits
+     pixel= look2bpp[c];
+     a0= gb_const_colorNormal35[(pixel & 0x000000FF)];
+     a1= gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
+     a2= gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+     a3 = gb_const_colorNormal35[((pixel>>24) & 0x000000FF)];
+     a32= a2 | (a3<<8) | (a0<<16) | (a1<<24);
+     look2bpp[c] = a32;    
+    #endif
+   }
+   break;
+  case 2:
+   for (c=0;c<256;c++)
+   {
+    look2bpp[c]=gapal[c&1]<<24;
+    look2bpp[c]|=gapal[(c>>2)&1]<<16;
+    look2bpp[c]|=gapal[(c>>4)&1]<<8;
+    look2bpp[c]|=gapal[(c>>6)&1];
+
+    #ifdef use_lib_320x200_video_border
+    #else
+     //Ordenamos y asignamos DMA 32 bits
+     pixel= look2bpp[c];
+     a0= gb_const_colorNormal35[(pixel & 0x000000FF)];
+     a1= gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
+     a2= gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+     a3 = gb_const_colorNormal35[((pixel>>24) & 0x000000FF)];
+     a32= a2 | (a3<<8) | (a0<<16) | (a1<<24);
+     look2bpp[c] = a32;    
+    #endif 
+   }
+   break;
                 case 4:
 //JJ                for (c=0;c<256;c++)
 //JJ                {
@@ -233,25 +299,6 @@ void remakelookup()
 }
 
 
-#ifdef use_lib_vga8colors
-//8 colores
-static unsigned char gb_const_colorNormal35[35]={
- BLACK, BLUE, BLUE, GREEN, YELLOW, BLUE, MAGENTA, BLUE,
- RED, MAGENTA, YELLOW, YELLOW, WHITE, RED, CYAN, RED,
- MAGENTA, BLUE, GREEN, GREEN, CYAN, BLACK, BLUE, GREEN,
- BLUE, MAGENTA, GREEN, GREEN, CYAN, RED, MAGENTA, GREEN,
- MAGENTA, BLUE, BLACK
-};
-#else
-//64 colores
-static unsigned char gb_const_colorNormal35[35]={
-  0,21,21,29,31,16,35,20,
-  23,35,47,15,63,3,60,7,
-  59,16,28,12,61,0,48,4,
-  36,17,29,14,62,1,49,5,
-  58,42,21
-};
-#endif
 
 //inline void SDL_rectfill(int x1, int y1, int x2, int y2,int pixel)
 //{
@@ -263,144 +310,255 @@ static unsigned char gb_const_colorNormal35[35]={
 //#define gbvgaMask8Colores 0x3F
 //#define gbvgaBits8Colores 0x40
 
-#ifdef use_lib_ultrafast_vga 
- //**************************************
- void PrepareColorsUltraFastVGA()
- {  
-  //(color & RGBAXMask) | SBits;
-  #ifdef use_lib_vga8colors
-   #ifdef use_lib_vga_low_memory
-   #else
-    for (unsigned char i=0;i<35;i++)
-    {
-     gb_const_colorNormal35[i]= ((gb_const_colorNormal35[i] & vga.RGBAXMask)|vga.SBits);
-    }    
-   #endif
-  #else  
-   for (unsigned char i=0;i<35;i++)
-   {
-    gb_const_colorNormal35[i]= ((gb_const_colorNormal35[i] & vga.RGBAXMask)|vga.SBits);
-   }    
-  #endif 
- } 
-#endif 
 
-//**************************************
-inline void SDLputpixel32(unsigned char x, unsigned short int y, unsigned int pixel)
-{        
- #if (defined use_lib_400x300) || (defined use_lib_320x200_video_noborder)        
-  int auxX = x<<2;//X*4
- #else
-  int auxX = (x<<1)+x;//X*3
- #endif 
- #ifdef use_lib_ultrafast_vga
-  #ifdef use_lib_vga_low_memory
-   #if (defined use_lib_400x300) || (defined use_lib_320x200_video_noborder)
-    #ifdef use_lib_vga8colors
-     if(auxX & 1){//Impar primero
-      ptrVGA[y][auxX >> 1] = (ptrVGA[y][auxX >> 1] & 0xf) | (gb_const_colorNormal35[(pixel & 0x000000FF)] << 4);      
-      ptrVGA[y][(auxX+1) >> 1] = (ptrVGA[y][(auxX+1) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>8) & 0x000000FF)] & 0xf);
-      ptrVGA[y][(auxX+2) >> 1] = (ptrVGA[y][(auxX+2) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] << 4);
-      ptrVGA[y][(auxX+3) >> 1] = (ptrVGA[y][(auxX+3) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>24) & 0x000000FF)] & 0xf);
-     }
-     else{//Par primero
-      ptrVGA[y][auxX >> 1] = (ptrVGA[y][auxX >> 1] & 0xf0) | (gb_const_colorNormal35[(pixel & 0x000000FF)] & 0xf);      
-      ptrVGA[y][(auxX+1) >> 1] = (ptrVGA[y][(auxX+1) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>8) & 0x000000FF)] << 4);
-      ptrVGA[y][(auxX+2) >> 1] = (ptrVGA[y][(auxX+2) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] & 0xf);
-      ptrVGA[y][(auxX+3) >> 1] = (ptrVGA[y][(auxX+3) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>24) & 0x000000FF)] << 4);
-     }
-     //ptrVGA[y][auxX] = gb_const_colorNormal35[(pixel & 0x000000FF)];
-     //ptrVGA[y][(auxX+1)] = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
-     //ptrVGA[y][(auxX+2)] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
-     //ptrVGA[y][(auxX+3)] = gb_const_colorNormal35[((pixel>>24) & 0x000000FF)];
-    #else     
-     ptrVGA[y][auxX] = gb_const_colorNormal35[(pixel & 0x000000FF)];
-     ptrVGA[y][(auxX+1)] = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
-     ptrVGA[y][(auxX+2)] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
-     ptrVGA[y][(auxX+3)] = gb_const_colorNormal35[((pixel>>24) & 0x000000FF)];
-    #endif
-   #else
-    //Modo 320x200 con borde    
-    #ifdef use_lib_vga8colors
-     //320x200 borde 8 colores low fastvga
-     if(auxX & 1){//Impar primero
-      ptrVGA[y][auxX >> 1] = (ptrVGA[y][auxX >> 1] & 0xf) | (gb_const_colorNormal35[(pixel & 0x000000FF)] << 4);      
-      ptrVGA[y][(auxX+1) >> 1] = (ptrVGA[y][(auxX+1) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>8) & 0x000000FF)] & 0xf);
-      ptrVGA[y][(auxX+2) >> 1] = (ptrVGA[y][(auxX+2) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] << 4);
-     }
-     else{//Par primero
-      ptrVGA[y][auxX >> 1] = (ptrVGA[y][auxX >> 1] & 0xf0) | (gb_const_colorNormal35[(pixel & 0x000000FF)] & 0xf);      
-      ptrVGA[y][(auxX+1) >> 1] = (ptrVGA[y][(auxX+1) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>8) & 0x000000FF)] << 4);
-      ptrVGA[y][(auxX+2) >> 1] = (ptrVGA[y][(auxX+2) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] & 0xf);
-     }     
-    #else
-     //320x200 borde 64 colores low fastvga
-     ptrVGA[y][auxX] = gb_const_colorNormal35[(pixel & 0x000000FF)];
-     ptrVGA[y][(auxX+1)] = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
-     ptrVGA[y][(auxX+2)] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
-    #endif
-   #endif
-  #else
-   #if (defined use_lib_400x300) || (defined use_lib_320x200_video_noborder)
-    ptrVGA[y][auxX^2] = gb_const_colorNormal35[(pixel & 0x000000FF)];
-    ptrVGA[y][(auxX+1)^2] = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
-    ptrVGA[y][(auxX+2)^2] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
-    ptrVGA[y][(auxX+3)^2] = gb_const_colorNormal35[((pixel>>24) & 0x000000FF)];
-   #else
-    //Video 320x200 borde relacion aspecto fastvga doble buffer
-    ptrVGA[y][auxX^2] = gb_const_colorNormal35[(pixel & 0x000000FF)];
-    ptrVGA[y][(auxX+1)^2] = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
-    ptrVGA[y][(auxX+2)^2] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
-   #endif 
-  #endif
- #else
-  #if (defined use_lib_400x300) || (defined use_lib_320x200_video_noborder)
-   vga.dotFast(auxX,y,gb_const_colorNormal35[(pixel & 0x000000FF)]);
-   vga.dotFast(auxX+1,y,gb_const_colorNormal35[((pixel>>8) & 0x000000FF)]);
-   vga.dotFast(auxX+2,y,gb_const_colorNormal35[((pixel>>16) & 0x000000FF)]);
-   vga.dotFast(auxX+3,y,gb_const_colorNormal35[((pixel>>24) & 0x000000FF)]);
-  #else
-   //Video 320x200 con borde relacion aspecto normal doble buffer
-   vga.dotFast(auxX,y,gb_const_colorNormal35[(pixel & 0x000000FF)]);
-   vga.dotFast(auxX+1,y,gb_const_colorNormal35[((pixel>>8) & 0x000000FF)]);
-   vga.dotFast(auxX+2,y,gb_const_colorNormal35[((pixel>>16) & 0x000000FF)]);
-  #endif 
- #endif 
+void jj_fast_putpixel(int x,int y,unsigned char c)
+{
+ gb_buffer_vga[y][x^2]= gb_const_colorNormal35[c];
 }
+
+
+void SDLClear()
+{
+ unsigned int a32= gb_const_colorNormal35[0];
+ a32= a32|(a32<<8)|(a32<<16)|(a32<<24);
+ for (int y=0; y<gb_topeY; y++){
+  for (int x=0; x<gb_topeX_div4; x++){
+   gb_buffer_vga32[y][x]= a32;
+  }
+ }
+}
+
+//void SDLClear()
+//{
+// #ifdef use_lib_ultrafast_vga        
+//  unsigned int a32= gb_const_colorNormal35[0];
+//  a32= a32|(a32<<8)|(a32<<16)|(a32<<24);
+//  for (int y=0; y<gb_topeY; y++){
+//   for (int x=0; x<gb_topeX_div4; x++){
+//    gb_buffer_vga32[y][x]= a32;
+//   }
+//  }
+// #else
+// #endif
+//
+// //for (int x=0; x<gb_topeX; x++)  
+// //for (int x=0; x<(gb_topeX>>2); x++)
+// //{      
+// // gb_buffer_vga[y][x]= a32;
+// // //gb_buffer_vga[y][x^2]= gb_const_colorNormal35[0];
+// //} 
+// //jj_fast_putpixel(x,y,0);    
+//}
+
+
+void PrepareColorsUltraFastVGA()
+{  
+ //(color & RGBAXMask) | SBits;
+ #ifdef use_lib_vga8colors
+  for (unsigned char i=0;i<35;i++){   
+   gb_const_colorNormal35[i]= (gb_const_colorNormal35[i] & 0x07) | gb_sync_bits;
+  }
+ #else
+  for (unsigned char i=0;i<35;i++){//DAC 6 bits 64 colores
+   gb_const_colorNormal35[i]= (gb_const_colorNormal35[i] & 0x3F) | gb_sync_bits;
+  }
+ #endif
+}
+
+
+//#ifdef use_lib_ultrafast_vga 
+// //**************************************
+// void PrepareColorsUltraFastVGA()
+// {  
+//  //(color & RGBAXMask) | SBits;
+//  #ifdef use_lib_tinybitluni_fast
+//   for (unsigned char i=0;i<35;i++)
+//   {           
+//    gb_const_colorNormal35[i]= gb_const_colorNormal35[i] | gb_sync_bits;
+//    //Prueba 8 colores tiny bitluni
+//    //gb_const_colorNormal35[i]= (gb_const_colorNormal35[i] & 0x03) | gb_sync_bits;
+//   }      
+//  #else
+//   #ifdef use_lib_vga8colors
+//    #ifdef use_lib_vga_low_memory
+//    #else
+//     for (unsigned char i=0;i<35;i++)
+//     {
+//      gb_const_colorNormal35[i]= ((gb_const_colorNormal35[i] & vga.RGBAXMask)|vga.SBits);
+//     }    
+//    #endif
+//   #else  
+//    for (unsigned char i=0;i<35;i++)
+//    {
+//     gb_const_colorNormal35[i]= ((gb_const_colorNormal35[i] & vga.RGBAXMask)|vga.SBits);
+//    }    
+//   #endif 
+//  #endif 
+// } 
+//#endif 
+
+//Ya no lo nececesito
+//**************************************
+//inline void SDLputpixel32(unsigned char x, unsigned short int y, unsigned int pixel)
+//{
+// unsigned int a0,a1,a2,a3,a32;
+// #if (defined use_lib_400x300) || (defined use_lib_320x200_video_noborder)        
+//  int auxX = x<<2;//X*4
+// #else
+//  int auxX = (x<<1)+x;//X*3
+// #endif 
+// #ifdef use_lib_ultrafast_vga
+//  #ifdef use_lib_vga_low_memory
+//   #if (defined use_lib_400x300) || (defined use_lib_320x200_video_noborder)
+//    #ifdef use_lib_vga8colors
+//     if(auxX & 1){//Impar primero
+//      gb_buffer_vga[y][auxX >> 1] = (gb_buffer_vga[y][auxX >> 1] & 0xf) | (gb_const_colorNormal35[(pixel & 0x000000FF)] << 4);      
+//      gb_buffer_vga[y][(auxX+1) >> 1] = (gb_buffer_vga[y][(auxX+1) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>8) & 0x000000FF)] & 0xf);
+//      gb_buffer_vga[y][(auxX+2) >> 1] = (gb_buffer_vga[y][(auxX+2) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] << 4);
+//      gb_buffer_vga[y][(auxX+3) >> 1] = (gb_buffer_vga[y][(auxX+3) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>24) & 0x000000FF)] & 0xf);
+//     }
+//     else{//Par primero
+//      gb_buffer_vga[y][auxX >> 1] = (gb_buffer_vga[y][auxX >> 1] & 0xf0) | (gb_const_colorNormal35[(pixel & 0x000000FF)] & 0xf);      
+//      gb_buffer_vga[y][(auxX+1) >> 1] = (gb_buffer_vga[y][(auxX+1) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>8) & 0x000000FF)] << 4);
+//      gb_buffer_vga[y][(auxX+2) >> 1] = (gb_buffer_vga[y][(auxX+2) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] & 0xf);
+//      gb_buffer_vga[y][(auxX+3) >> 1] = (gb_buffer_vga[y][(auxX+3) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>24) & 0x000000FF)] << 4);
+//     }
+//     //ptrVGA[y][auxX] = gb_const_colorNormal35[(pixel & 0x000000FF)];
+//     //ptrVGA[y][(auxX+1)] = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
+//     //ptrVGA[y][(auxX+2)] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+//     //ptrVGA[y][(auxX+3)] = gb_const_colorNormal35[((pixel>>24) & 0x000000FF)];
+//    #else     
+//     ptrVGA[y][auxX] = gb_const_colorNormal35[(pixel & 0x000000FF)];
+//     ptrVGA[y][(auxX+1)] = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
+//     ptrVGA[y][(auxX+2)] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+//     ptrVGA[y][(auxX+3)] = gb_const_colorNormal35[((pixel>>24) & 0x000000FF)];
+//    #endif
+//   #else
+//    //Modo 320x200 con borde    
+//    #ifdef use_lib_vga8colors
+//     //320x200 borde 8 colores low fastvga
+//     if(auxX & 1){//Impar primero
+//      ptrVGA[y][auxX >> 1] = (ptrVGA[y][auxX >> 1] & 0xf) | (gb_const_colorNormal35[(pixel & 0x000000FF)] << 4);      
+//      ptrVGA[y][(auxX+1) >> 1] = (ptrVGA[y][(auxX+1) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>8) & 0x000000FF)] & 0xf);
+//      ptrVGA[y][(auxX+2) >> 1] = (ptrVGA[y][(auxX+2) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] << 4);
+//     }
+//     else{//Par primero
+//      ptrVGA[y][auxX >> 1] = (ptrVGA[y][auxX >> 1] & 0xf0) | (gb_const_colorNormal35[(pixel & 0x000000FF)] & 0xf);      
+//      ptrVGA[y][(auxX+1) >> 1] = (ptrVGA[y][(auxX+1) >> 1] & 0xf) | (gb_const_colorNormal35[((pixel>>8) & 0x000000FF)] << 4);
+//      ptrVGA[y][(auxX+2) >> 1] = (ptrVGA[y][(auxX+2) >> 1] & 0xf0) | (gb_const_colorNormal35[((pixel>>16) & 0x000000FF)] & 0xf);
+//     }     
+//    #else
+//     //320x200 borde 64 colores low fastvga
+//     ptrVGA[y][auxX] = gb_const_colorNormal35[(pixel & 0x000000FF)];
+//     ptrVGA[y][(auxX+1)] = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
+//     ptrVGA[y][(auxX+2)] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+//    #endif
+//   #endif
+//  #else
+//   #if (defined use_lib_400x300) || (defined use_lib_320x200_video_noborder)
+//    //Begin OK
+//    //gb_buffer_vga[y][auxX^2] = gb_const_colorNormal35[(pixel & 0x000000FF)];
+//    //gb_buffer_vga[y][(auxX+1)^2] = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
+//    //gb_buffer_vga[y][(auxX+2)^2] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+//    //gb_buffer_vga[y][(auxX+3)^2] = gb_const_colorNormal35[((pixel>>24) & 0x000000FF)];
+//    //Fin OK    
+//    a0 = gb_const_colorNormal35[(pixel & 0x000000FF)];
+//    a1 = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
+//    a2 = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+//    a3 = gb_const_colorNormal35[((pixel>>24) & 0x000000FF)];
+//    a32= a2 | (a3<<8) | (a0<<16) | (a1<<24);
+//    gb_buffer_vga32[y][x]=a32;
+//   #else
+//    //Video 320x200 borde relacion aspecto fastvga doble buffer
+//    gb_buffer_vga[y][auxX^2] = gb_const_colorNormal35[(pixel & 0x000000FF)];
+//    gb_buffer_vga[y][(auxX+1)^2] = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
+//    gb_buffer_vga[y][(auxX+2)^2] = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+//   #endif 
+//  #endif
+// #else
+//  #if (defined use_lib_400x300) || (defined use_lib_320x200_video_noborder)
+//   vga.dotFast(auxX,y,gb_const_colorNormal35[(pixel & 0x000000FF)]);
+//   vga.dotFast(auxX+1,y,gb_const_colorNormal35[((pixel>>8) & 0x000000FF)]);
+//   vga.dotFast(auxX+2,y,gb_const_colorNormal35[((pixel>>16) & 0x000000FF)]);
+//   vga.dotFast(auxX+3,y,gb_const_colorNormal35[((pixel>>24) & 0x000000FF)]);
+//  #else
+//   //Video 320x200 con borde relacion aspecto normal doble buffer
+//   vga.dotFast(auxX,y,gb_const_colorNormal35[(pixel & 0x000000FF)]);
+//   vga.dotFast(auxX+1,y,gb_const_colorNormal35[((pixel>>8) & 0x000000FF)]);
+//   vga.dotFast(auxX+2,y,gb_const_colorNormal35[((pixel>>16) & 0x000000FF)]);
+//  #endif 
+// #endif 
+//}
 
 //*****************************************************************
 inline void SDL_hline(int x1,int y1,int x2,unsigned char pixel)
-{              
+{
+ unsigned int a0,a32;       
+ #ifdef use_lib_320x200_video_border
+  for (int x=(x1>>2);x<=(x2>>2);x++) //Aniado un pixel mas
+ #else
+  for (int x=(x1>>2);x<(x2>>2);x++) //Div 4 32 bits
+ #endif
+ {
+  a0 = gb_const_colorNormal35[pixel];
+  a32= a0 | (a0<<8) | (a0<<16) | (a0<<24);
+  gb_buffer_vga32[y1][x] = a32;
+ }
+
+ /*        
+ unsigned int a0,a32;
  #ifdef use_lib_ultrafast_vga        
   #ifdef use_lib_vga_low_memory
    #ifdef use_lib_vga8colors
     for (int x=x1;x<x2;x++)
     {
      if(x & 1)
-      ptrVGA[y1][x >> 1] =  (ptrVGA[y1][x >> 1] & 0xf) | (gb_const_colorNormal35[pixel] << 4);
+      gb_buffer_vga[y1][x >> 1] =  (gb_buffer_vga[y1][x >> 1] & 0xf) | (gb_const_colorNormal35[pixel] << 4);
      else
-      ptrVGA[y1][x >> 1] = (ptrVGA[y1][x >> 1] & 0xf0) | (gb_const_colorNormal35[pixel] & 0xf);
+      gb_buffer_vga[y1][x >> 1] = (gb_buffer_vga[y1][x >> 1] & 0xf0) | (gb_const_colorNormal35[pixel] & 0xf);
      //ptrVGA[y1][x] = gb_const_colorNormal35[pixel];
     }
    #else
     for (int x=x1;x<x2;x++)
     {
-     ptrVGA[y1][x] = gb_const_colorNormal35[pixel];
+     gb_buffer_vga[y1][x] = gb_const_colorNormal35[pixel];
     }
    #endif
   #else
-   for (int x=x1;x<x2;x++)
-    ptrVGA[y1][x^2] = gb_const_colorNormal35[pixel];
+   //Begin OK
+   //for (int x=x1;x<x2;x++)
+   //{
+   // gb_buffer_vga[y1][x^2] = gb_const_colorNormal35[pixel];
+   //}
+   //End OK
+   #ifdef use_lib_320x200_video_border
+    for (int x=(x1>>2);x<=(x2>>2);x++)//Aniado un pixel mas
+    {
+     a0 = gb_const_colorNormal35[pixel];
+     a32= a0 | (a0<<8) | (a0<<16) | (a0<<24);
+     gb_buffer_vga32[y1][x] = a32;
+    }      
+   #else
+    for (int x=(x1>>2);x<(x2>>2);x++) //Div 4 32 bits
+    {
+     a0 = gb_const_colorNormal35[pixel];
+     a32= a0 | (a0<<8) | (a0<<16) | (a0<<24);
+     gb_buffer_vga32[y1][x] = a32;
+    }
+   #endif 
   #endif  
  #else
   for (int x=x1;x<x2;x++)
    vga.dotFast(x, y1, gb_const_colorNormal35[pixel]); 
  #endif
+ */
 }
 
 //******************************
 void pollline()
 {
+ unsigned int a0,a1,a2,a3,a32,pixel;
+ int cur_y,cur_x;
  int aux_d;
  int aux_c;
  int aux_crtctable;
@@ -470,8 +628,8 @@ void pollline()
       SDL_hline(0,(crtcline-72)&511,((xoff<<1)+xoff),gaborder); //cuadrado izquierdo     
      }       
     #endif    
-   #endif
-   aux_d= ((sc&7)<<11);
+   #endif   
+   aux_d= ((sc&7)<<11);   
    for (x=0;x<crtcregs[1]<<1;x++)
    {
     //precalculada crtctable[d][c]=(c&0x7FF)|(d<<11)|((c&0x6000)<<1);
@@ -489,20 +647,55 @@ void pollline()
      //JJ((unsigned long *)b->line[(crtcline-16)&511])[(x+xoff)&127]=look2bpp[v];
      if ((crtcline-16)>=0)
      {
-      SDLputpixel32((x+xoff)&127, (crtcline-16)&511, look2bpp[v]);   
+      //Begin OK
+      //SDLputpixel32((x+xoff)&127, (crtcline-16)&511, look2bpp[v]);   
+      //End OK
+      cur_y= (crtcline-16)&511;
+      cur_x= (x+xoff)&127;
+      //pixel = look2bpp[v];
+      //a0 = gb_const_colorNormal35[(pixel & 0x000000FF)];
+      //a1 = gb_const_colorNormal35[((pixel>>8) & 0x000000FF)];
+      //a2 = gb_const_colorNormal35[((pixel>>16) & 0x000000FF)];
+      //a3 = gb_const_colorNormal35[((pixel>>24) & 0x000000FF)];
+      //a32= a2 | (a3<<8) | (a0<<16) | (a1<<24);
+      //gb_buffer_vga32[cur_y][cur_x]=a32;
+      gb_buffer_vga32[cur_y][cur_x]= look2bpp[v]; //Directo DMA 32 bits
      }
     #else
      #ifdef use_lib_320x200_video_noborder
       if (crtcline >=72 && crtcline <270)
       {
        if (x>=0 && x<80)
-        SDLputpixel32(x, (crtcline-72), look2bpp[v]);                
+       {
+        //BEGIN OK 320x200 no borde
+        //SDLputpixel32(x, (crtcline-72), look2bpp[v]);
+        //END OK 320x200 no borde
+        cur_y= (crtcline-72);
+        cur_x= x; //x4 32 bits
+        //gb_buffer_vga32[cur_y][cur_x]=a32;
+        //if ((cur_y>=0)&&(cur_y<170)&&(cur_x>=0)&&(cur_x<70))
+        //{
+         gb_buffer_vga32[cur_y][cur_x]= look2bpp[v];
+        //}
+       }
       }
      #else
       if (crtcline >=72 && crtcline <270)
-      {//320x200 no border
-       if (x>=0 && x<96)            
-        SDLputpixel32(x+xoff, (crtcline-72)&511, look2bpp[v]);
+      {//320x200 border
+       if (x>=0 && x<96)
+       {
+        //Begin OK 320x200 border
+        //SDLputpixel32(x+xoff, (crtcline-72)&511, look2bpp[v]);
+        //End OK 320x200 border
+        cur_y= (crtcline-72)&511;
+        cur_x= (x+xoff) &127;
+
+        cur_x= (cur_x<<1)+cur_x; //X x 3 relacion aspecto
+        a32= look2bpp[v];
+        gb_buffer_vga[cur_y][cur_x^2] = gb_const_colorNormal35[(a32 & 0x000000FF)];
+        gb_buffer_vga[cur_y][(cur_x+1)^2] = gb_const_colorNormal35[((a32>>8) & 0x000000FF)];
+        gb_buffer_vga[cur_y][(cur_x+2)^2] = gb_const_colorNormal35[((a32>>16) & 0x000000FF)];
+       }
       }     
      #endif 
     #endif
@@ -515,8 +708,11 @@ void pollline()
     }
    #else 
     #ifdef use_lib_320x200_video_border
-     if (crtcline >=72 && crtcline <270){
-      SDL_hline((((x+xoff)<<1)+(x+xoff)),(crtcline-72)&511,319,gaborder); //cuadrado derecho 320x200
+     if (crtcline >=72 && crtcline <270)
+     {
+      //SDL_hline((((x+xoff)<<1)+(x+xoff)),(crtcline-72)&511,319,gaborder); //cuadrado derecho 320x200
+      //Para DMA 32 bits borde le quito 4 bytes
+      SDL_hline((((x+xoff)<<1)+(x+xoff)),(crtcline-72)&511,313,gaborder); //cuadrado derecho 320x200
      }
     #endif    
    #endif 
@@ -535,7 +731,8 @@ void pollline()
    #ifdef use_lib_400x300
     if ((crtcline-16)>=0) //comprobacion limite
     {
-     SDL_hline(0,(crtcline-16)&511,399,gaborder); //Arriba y abajo
+     //SDL_hline(0,(crtcline-16)&511,399,gaborder); //Arriba y abajo
+     SDL_hline(0,(crtcline-16)&511,400,gaborder); //Arriba y abajo
     }
    #endif 
   }

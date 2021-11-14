@@ -13,7 +13,7 @@
 #include "GA.h"
 #include "CRTC.h"
 #include "8255.h"
-#include "gb_globals.h"
+#include "gbGlobals.h"
 #include "dataFlash/gbrom.h"
 
 z80reg af,bc,de,hl,ix,iy,ir,saf,sbc,sde,shl;

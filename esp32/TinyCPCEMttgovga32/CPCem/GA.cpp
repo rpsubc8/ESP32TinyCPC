@@ -2,7 +2,7 @@
 #include "CPCem.h"
 #include "GA.h"
 #include "CRTC.h"
-#include "gb_globals.h"
+#include "gbGlobals.h"
 
 int galines;
 int gapal[16];
