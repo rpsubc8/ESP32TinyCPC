@@ -22,6 +22,7 @@ He realizado varias modificaciones:
  <li>Emulación CPC 464 y 664</li>
  <li>Emulacion CPC 6128 (inestable)</li>
  <li>Emulación de AMX Mouse (librería reducida de <b>Rob Kent</b> jazzycamel)</li>
+ <li>Ya se permite tener el modo de video 400x300 64 colores, el modo 128 KB, así como el ratón y el sonido todo activo.</li>
 </ul> 
   
 <br>
