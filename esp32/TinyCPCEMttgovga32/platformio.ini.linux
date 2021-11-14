@@ -21,7 +21,7 @@ monitor_speed = 115200
 ;board_build.partitions = noota_3g.csv
 board_build.partitions = huge_app.csv
 build_flags =
-    -w -O2    
+    -s -w -O2    
 ;    -DBOARD_HAS_PSRAM
 ;    -mfix-esp32-psram-cache-issue
 
