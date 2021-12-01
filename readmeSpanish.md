@@ -131,7 +131,10 @@ Para poder usar un ratón como si fuera un AMX Mouse, se requiere activar en el 
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewAmxMouse.gif'></center>
 Se permite configurar el ratón para zurdos (también desde el OSD), así como los tiempos de muestreo, todo ello en el fichero <b>gbConfig.h</b>.
 
-
+<br><br>
+<h1>DIY circuito</h1>
+Si no queremos usar una placa TTGO VGA32 v1.x, podemos construirla siguiendo el esquema de <b>fabgl</b>:
+<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/fabglcircuit.gif'></center>
 
 <br><br>
 <h1>Tool dsk2h</h1>
