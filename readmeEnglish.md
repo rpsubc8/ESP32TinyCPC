@@ -2,7 +2,6 @@
 
 # Tiny ESP32 AMSTRAD CPC
 <br>
-<h2>English documentation of the new version 2021/14/11 is not yet updated. Only the Spanish version.</h2>
 Port from Tom Walker's PC emulator (AMSTRAD CPC) to TTGO VGA32 v1.2 board with ESP32.
 <br><br>
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewCPC464.gif'></center>
@@ -49,8 +48,7 @@ PLATFORMIO 2.2.1 must be installed from the Visual Studio extensions. Espressif3
 Then the working directory <b>TinyCPCEMttgovga32</b> will be selected.
 We must modify the file <b>platformio.ini</b> the option <b>upload_port</b> to select the COM port where we have our TTGO VGA32 board.
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewPlatformIO.gif'></center>
-Then we will proceed to compile and upload to the board. No partitions are used, so we must upload all the compiled binary.
-Everything is prepared so we don't have to install the bitluni libraries. However, if we need the sound options, we will need to install the <b>fabgl</b> libraries, only for the Arduino IDE, since for PLATFORMIO have left the libraries in the project.
+Then we will proceed to compile and upload to the board. No partitions are used, so we must upload the whole compiled binary. It's all set up so you don't have to install the bitluni and fabgl libraries. 
 
 
 
@@ -61,9 +59,7 @@ We only have to open the <b>CPCem.ino</b> from the <b>CPCem</b> directory.
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewArduinoIDEpreferences.gif'></center>
 We must install the spressif extensions in the additional card url manager <b>https://dl.espressif.com/dl/package_esp32_index.json</b>
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewArduinoIDElibrary.gif'></center>
-For the normal mode, the project is already prepared, so that no bitluni library is needed. However, if we need the sound support, it is required to install the libraries <b>fabgl 0.9.0</b>.
-We can do it from the library manager.
-We must deactivate the PSRAM option, and in case of exceeding 1 MB of binary, select 4 MB of partition at the time of uploading. Although the code does not use PSRAM, if the option is active and our ESP32 does not have it, an exception will be generated and restart it in loop mode.
+The project is now ready, so no bitluni or fabgl libraries are needed. We must deactivate the PSRAM option, and in case of exceeding 1 MB of binary, select 4 MB of partition when uploading. Although the code does not use PSRAM, if the option is active and our ESP32 does not have it, an exception will be generated and it will restart in loop mode. 
 
 
 
@@ -77,6 +73,11 @@ The following actions are allowed from the menu (key F1):
   <li>Allows you to skip a frame</li>
   <li>Change the milliseconds of polling for video, keyboard and sound</li>
   <li>Change the milliseconds of waiting in each frame</li>
+  <li>Sound Volume (100%, 75,%, 50%, 25%, 5%)</li>
+  <li>Sound active or muted</li>
+  <li>CPU wait in AUTO mode (set 20 ms per real frame) or the wait in ms of your choice</li>
+  <li>Mouse Detect, allows to re-initialize the mouse, if it has been disconnected while hot</li>
+  <li>Mouse ON and OFF, allows you to disable the mouse reading. This way the emulation is faster.</li> 
  </ul>
  There is a basic OSD of low resources, that is to say, very simple, that is visualized by pressing the key <b>F1</b>.
  <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewOSD.gif'></center>
@@ -93,10 +94,8 @@ The file <b>gbConfig.h</b> options are selected:
  <li><b>use_lib_400x300:</b> 400x300 video mode is used.</li>
  <li><b>use_lib_320x200_video_border:</b> 320x200 video mode with borders is used, so the screen size is halved. This mode consumes less RAM than 400x300 and is faster.</li>
  <li><b>use_lib_320x200_video_noborder:</b> 320x200 video mode without borders is used. In this mode the screen is not halved, but the borders are lost. This mode consumes less RAM than 400x300 and is faster.</li>
- <li><b>use_lib_vga8colors:</b> Force to use RGB 8 color mode (3 pins). It consumes little ram and is very fast, but only takes 8 colors, compared to 64 in normal mode (6 pins RRGGBB).</li>
- <li><b>use_lib_vga_low_memory:</b> Experimental mode with low video RAM consumption, but slower. 
- <li><b>use_lib_ultrafast_vga:</b> Ultra fast experimental mode, which achieves almost double the video access speed.</li>
- <li><b>use_lib_sound_ay8912:</b> A 3 channel mixer is used in dirty mode, emulating AY8912. It consumes quite a lot of ram. The fabgl library 0.9.0</li> is required</li>
+ <li><b>use_lib_vga8colors:</b> Forces to use RGB 8-color mode (3 pins). Outputs 8 colors, as opposed to 64 in normal mode (6 pins RRGGBB).</li>
+ <li><b>use_lib_sound_ay8912:</b> It uses a 3-channel mixer in dirty mode, emulating the AY8912. It consumes some RAM. It requires the reduced fabgl 0.9.0 library, already included in the project.</li>
  <li><b>use_lib_log_serial:</b> Logs are sent by serial port usb</li>
  <li><b>usb_lib_optimice_checkchange_bankswitch:</b> Only switches banks when they are different, gaining speed.</li>
  <li><b>use_lib_128k:</b> Allows to use 128K mode, including 6128 rom at compilation, as well as 2 blocks of 64KB memory. It is in the testing phase, and as it requires more RAM, you have to use other low RAM consumption configuration options.</li>
@@ -105,7 +104,8 @@ The file <b>gbConfig.h</b> options are selected:
  <li><b>gb_ms_sound:</b> You must specify the number of milliseconds of polling for the sound.</li>
  <li><b>gb_frame_crt_skip:</b> If it is 1 it skips a frame.</li>
  <li><b>gb_delay_emulate_ms:</b> Millisecond wait for each completed frame.</li>
- <li><b>use_lib_amx_mouse:</b> A PS/2 mouse is used as if it were an AMX mouse (emulated).</li>
+ <li><b>use_lib_amx_mouse:</b> A PS/2 mouse is used as if it were an AMX mouse (emulated). The use of the mouse consumes some CPU and memory.</li>
+ <li><b>gb_delay_init_ms:</b> Specifies a number of initial milliseconds to wait for the mouse to start up in order to detect it correctly. </li>
  <li><b>use_lib_amx_mouse_lefthanded:</b> Left-handed mouse (swaps buttons)</li>
  <li><b>gb_ms_mouse:</b> Sampling in milliseconds of each mouse reading.</li>
  <li><b>use_lib_lookup_znptable:</b> Uses look-up table in FLASH for BCD calculations. It consumes 256 bytes.</li>
@@ -131,9 +131,14 @@ We can choose the following games:
 
 <br>
 <h1>AMX Mouse</h1>
-To be able to use a mouse as if it were an AMX Mouse, it is required to activate the support in the configuration file. You need the <b>fabgl</b> library, which is already included in the PLATFORMIO project, while in the IDE ARDUINO we must install it. 
+In order to use a mouse as if it were an AMX Mouse, it is required to activate the support in the configuration file.
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewAmxMouse.gif'></center>
-It is possible to configure the mouse for left-handers (also from the OSD), as well as the sampling times, all in the gbConfig.h file.
+Left-handed mouse configuration is allowed (also from the OSD), as well as sampling times, all in the <b>gbConfig.h</b> file.
+
+<br><br>
+<h1>DIY circuito</h1>
+Si no queremos usar una placa TTGO VGA32 v1.x, podemos construirla siguiendo el esquema de fabgl:
+<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/fabglcircuit.gif'></center>
 
 
 
