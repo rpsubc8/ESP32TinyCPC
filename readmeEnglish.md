@@ -13,10 +13,10 @@ I have made several modifications:
  <li>Use of a single core</li>
  <li>Low-income OSD</li>
  <li>Created project compatible with Arduino IDE and Platform IO</li>
- <li>Emulation of AY8912 (fabgl)</li>
+ <li>AY8912 emulation (fabgl library) reduced version of <b>dcrespo3d</b>(David Crespo Tascón)</li>
  <li>Screen adjustment X</li>
- <li>Emulation video speed menu, sound, keyboard</li>
- <li>Support for 8 and 64 color mode</li>
+ <li>Emulation CPU speed menu (AUTO), sound, keyboard</li>
+ <li>Support for 8 and 64 color mode (reduced version by Ricardo Massaro).</li>
  <li>DSK support with 42 tracks and 11 sectors</li>
  <li>Emulates only the CRTC 0</li>
  <li>Supports 0, 1 and 2 video mode</li>
@@ -24,7 +24,8 @@ I have made several modifications:
  <li>VGA 320x200 with or without borders</li>
  <li>CPC 464 and 664 emulation</li>
  <li>CPC 6128 emulation (unstable)</li>
- <li>AMX mouse emulation</li>
+ <li>AMX Mouse emulation (reduced library by Rob Kent jazzycamel)</li>
+ <li>It is now possible to have 400x300 64 color video mode, 128 KB mode, as well as mouse and sound all active.</li>
 </ul>
 
   
@@ -33,17 +34,17 @@ I have made several modifications:
 Required:
  <ul>
   <li>TTGO VGA32 v1.2</li>
-  <li>Visual Studio 1.48.1 PLATFORM 2.2.0</li>
+  <li>Visual Studio 1.48.1 PLATFORMIO 2.2.1 Espressif32 v3.3.2</li>
   <li>Arduino IDE 1.8.11</li>
-  <li>Arduino fabgl version 0.9.0 (PLATFORMIO included)</li>
-  <li>Arduino bitluni version 0.3.3 (included)</li>
+  <li>Arduino fabgl 0.9.0 reduced library (included in PLATFORMIO project)</li>
+  <li>Arduino bitluni 0.3.3 reduced library (included in project)</li>
  </ul>
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/ttgovga32v12.jpg'></center>
 <br>
  
  
 <h1>PlatformIO</h1>
-PLATFORM 2.2.0 must be installed from the Visual Studio extensions.
+PLATFORMIO 2.2.1 must be installed from the Visual Studio extensions. Espressif32 v3.3.2 is also required. 
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/previewPlatformIOinstall.gif'></center>
 Then the working directory <b>TinyCPCEMttgovga32</b> will be selected.
 We must modify the file <b>platformio.ini</b> the option <b>upload_port</b> to select the COM port where we have our TTGO VGA32 board.
