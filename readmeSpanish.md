@@ -234,6 +234,13 @@ En el Arduino IDE, debemos elegir la opción <b>Partition Scheme (Huge APP)</b>.
 Los juegos en formato ROM (16 KB), se pueden cargar en LOW y en HIGH (slot 0 al 15). Cuando se selecciona la opción de <b>Run ROM</b> se autoescribe el nombre de la ROM que se invoca como comando RSX. Este comando RSX coincide con el nombre del archivo rom que se generó, por lo que debemos darle el nombre de archivo .ROM exacto al que se invoca.
 <br>
 Cuando queramos cargar otro juego, debemos resetear, o bien seleccionando el menú de Machine o bien Reset.
+<br>
+Si queremos lanzar el juego <b>arkanoid</b>, debemos elegir desde el menú <b>Load or Run ROM<b>, luego <b>Run ROM</b> y por último nos pedirá seleccionar <b>Arkanoid</b>. Al finalizar, seleccionamos <b>High ROM(0..15)</b>, en donde ponemos por ejemplo el slot 1, y en un par de segundos, se escribirá <b>|arkanoid</b>.
+<br>
+Si elegimos sólo <b>Load ROM</b>, hará lo mismo que lo anterior, pero sin lanzar el RSX <b>|arkanoid</b>. Este nombre de archivo debe coincidir con el nombre real del juego interno.
+<br>
+Si tenemos juego de varias ROMS, por ejemplo <b>3weeks.rom y 3weeks2.rom</b>, debemos cargar 3weeks.rom en slot 1 y 3weeks.rom2 en slot 2, y por último lanzar el principal, que en este caso sería <b>3weeks.rom</b>
+ 
 
 
 <br><br>
