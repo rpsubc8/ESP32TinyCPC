@@ -240,6 +240,9 @@ Si queremos lanzar el juego <b>arkanoid</b>, debemos elegir desde el menú <b>Lo
 Si elegimos sólo <b>Load ROM</b>, hará lo mismo que lo anterior, pero sin lanzar el RSX <b>|arkanoid</b>. Este nombre de archivo debe coincidir con el nombre real del juego interno.
 <br>
 Si tenemos juego de varias ROMS, por ejemplo <b>3weeks.rom y 3weeks2.rom</b>, debemos cargar 3weeks.rom en slot 1 y 3weeks.rom2 en slot 2, y por último lanzar el principal, que en este caso sería <b>3weeks.rom</b>
+<br><br>
+Más información de ROMS:
+<a href='https://www.cpcwiki.eu/index.php/ROM_List'>https://www.cpcwiki.eu/index.php/ROM_List</a>
  
 
 
