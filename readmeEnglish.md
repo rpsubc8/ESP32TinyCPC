@@ -32,7 +32,7 @@ I have made several modifications:
 <h1>Requirements</h1>
 Required:
  <ul>
-  <li>TTGO VGA32 v1.2</li>
+  <li>TTGO VGA32 v1.x (1.0, 1.1, 1.2, 1.4)</li>
   <li>Visual Studio 1.48.1 PLATFORMIO 2.2.1 Espressif32 v3.3.2</li>
   <li>Arduino IDE 1.8.11 Espressif System 1.0.6</li>
   <li>Arduino fabgl 0.9.0 reduced library (included in PLATFORMIO project)</li>
