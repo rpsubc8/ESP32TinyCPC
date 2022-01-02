@@ -34,7 +34,7 @@ Required:
  <ul>
   <li>TTGO VGA32 v1.2</li>
   <li>Visual Studio 1.48.1 PLATFORMIO 2.2.1 Espressif32 v3.3.2</li>
-  <li>Arduino IDE 1.8.11</li>
+  <li>Arduino IDE 1.8.11 Espressif System 1.0.6</li>
   <li>Arduino fabgl 0.9.0 reduced library (included in PLATFORMIO project)</li>
   <li>Arduino bitluni 0.3.3 reduced library (included in project)</li>
  </ul>
@@ -126,6 +126,76 @@ We can choose the following games:
  <li><b>Max Desk:</b> mouse test</li>
  <li><b>AMX mouse:</b> Image editor with mouse</li> 
 </ul>
+
+Everything has been compacted into several discs:
+<pre> 
+ Disk 1 
+  babaspalace
+   cod0.bin 40K
+   cod1.bin 2K
+   disc.bas 1K
+   intro.bin 9K
+   loader.bin 1K
+   screen.scr 17K
+  amsthree
+   amsthre3.scr 17K
+   amsthree.bin 38K
+   loader.bas 1K
+  sokoban
+   sokoban.bin 9K
+   sokoban.dat 19K
+ 
+ 
+ Disk 2
+  corsair trainer
+   code.bin 16K
+   codex.bin 16K
+   data.bin 17K
+   disc.bin 8K
+   intro.bin 17K
+   menuexo.bin  3K
+  amxmousev2
+   amx.bas 1K
+   art.bin 9K
+   art.icn 2K
+   char.bin 1K
+   colhats.bin 1K
+   demloa.bin 1K
+   demo.rs 9K
+   icondes.bas 10K
+   monmc.bin 1K
+   mspr.bin 2K 
+   ocode.bin 1K
+   pat1.pcn 1K
+   patdes.bas 8K
+   pgen.bas 11K
+   rom.icn 2K
+   rsxb.bin 2K
+   scrload.bas 2K
+   vdutab.o 1K
+
+
+ Disk 3
+  Max desk hide
+   maxdesk 1k
+   maxdesk.n01 1k
+   maxdesk.n02 34k
+   maxdesk.n04 17k
+   maxdesk.n05 2k
+   sysvars.bin 1k
+   dragon attack
+   block1.bin 5K
+   block2.bin 4K
+   block3.bin 5K
+   block4.bin 5K
+   block5.bin 5K
+   block6.bin 5K
+   block7.bin 5K
+   block8.bin 5K
+   code.bin 28K
+   disc.bin 1k
+   disc-ni.bin 1k
+</pre>
 <br><br>
 
 <br>
@@ -143,19 +213,39 @@ Si no queremos usar una placa TTGO VGA32 v1.x, podemos construirla siguiendo el 
 
 <br><br>
 <h1>Tool dsk2h</h1>
-I have created a very basic tool, to convert .dsk files to .h in ready mode to be processed by the emulator. We only have to leave the .dsk files in the folder <b>dsks</b> and execute the file <b>dsk2h.exe</b>, so that an output will be generated in the directory <b>dataFlash</b>. For testing purposes, 2 files have been left in the <b>dsks</b> directory, which it is recommended to delete in case a new custom list is made. It is also recommended to delete the files in the directory <b>CPCem\dataFlash\dsk</b> to have a clean project.<br><br>
+I have created a very basic tool, to convert .dsk files to .h, as well as roms in ready mode to be processed by the emulator. We just need to leave the .dsk files in the <b>dsks</b> folder, as well as .rom in <b>romextra</b> and run the file <b>dsk2h.exe</b>, so that an output will be generated in the directory <b>dataFlash</b>. For testing purposes, 2 files have been left in the <b>dsks</b> directory, which it is recommended to delete in case a new custom list is made. It is also recommended to delete the files in the directory <b>CPCem\dataFlash\dsk</b> to have a clean project.<br><br>
 <a href='https://github.com/rpsubc8/ESP32TinyCPC/tree/main/tools/dsk2h'>Tool dsk2h</a>
 <br><br>
 <pre>
- dsks/
- dataFlash/
+ input/
+  dsks/
+  romextra/
+ output/ 
+  dataFlash/
    dsk/
+   romextra/
 </pre>
 Then we must copy the directory <b>dataFlash</b> into the project <b>TinyCPCEMttgovga32\CPCem</b> overwriting the previous dataFlash folder. It is recommended to clean up the project and recompile it.<br>
 This tool is very simple, and does not control errors, so it is recommended to leave you the files with very simple names and as simple as possible.<br>
 The project in PLATFORM.IO is prepared for 2 MB of Flash. If we need the 4MB of flash, we will have to modify the entry in the file <b>platform.ini</b>
 <pre>board_build.partitions = huge_app.csv</pre>
 In the Arduino IDE, we must choose the option <b>Partition Scheme (Huge APP)</b>.
+
+
+<br><br>
+<h1>Load ROMS</h1>
+Games in ROM format (16 KB), can be loaded in LOW and HIGH (slot 0 to 15). When the <b>Run ROM</b> option is selected, the name of the ROM to be invoked as RSX command is autowritten. This RSX command matches the name of the rom file that was generated, so we must give it the exact .ROM file name that is invoked.
+<br>
+When we want to load another game, we must reset, either by selecting the Machine menu or Reset.
+<br>
+If we want to launch the game <b> arkanoid </b>, we must choose from the menu <b> Load or Run ROM </b>, then <b> Run ROM </b> and finally it will ask us to select <b> Arkanoid </b>. At the end, we select <b> High ROM (0..15) </b>, where we put for example slot 1, and in a couple of seconds, <b> | arkanoid </b> will be written.
+<br>
+If we choose just <b> Load ROM </b>, it will do the same as above, but without launching the RSX <b> | arkanoid </b>. This file name must match the actual name of the internal game.
+<br>
+If we have several ROMS games, for example <b> 3weeks.rom and 3weeks2.rom </b>, we must load 3weeks.rom in slot 1 and 3weeks.rom2 in slot 2, and finally launch the main one, which in this case would be <b> 3weeks.rom </b>
+<br><br>
+More information about ROMS:
+<a href='https://www.cpcwiki.eu/index.php/ROM_List'>https://www.cpcwiki.eu/index.php/ROM_List</a>
 
 
 <br><br>
