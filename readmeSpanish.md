@@ -125,6 +125,78 @@ Podemos elegir los siguientes juegos:
  <li><b>AMX Mouse:</b> Editor de imágenes con ratón</li> 
 </ul>
 
+Se ha compactado todo en varios discos:
+<pre> 
+ Disco 1 
+  babaspalace
+   cod0.bin 40K
+   cod1.bin 2K
+   disc.bas 1K
+   intro.bin 9K
+   loader.bin 1K
+   screen.scr 17K
+  amsthree
+   amsthre3.scr 17K
+   amsthree.bin 38K
+   loader.bas 1K
+  sokoban
+   sokoban.bin 9K
+   sokoban.dat 19K
+ 
+ 
+ Disco 2
+  corsair trainer
+   code.bin 16K
+   codex.bin 16K
+   data.bin 17K
+   disc.bin 8K
+   intro.bin 17K
+   menuexo.bin  3K
+  amxmousev2
+   amx.bas 1K
+   art.bin 9K
+   art.icn 2K
+   char.bin 1K
+   colhats.bin 1K
+   demloa.bin 1K
+   demo.rs 9K
+   icondes.bas 10K
+   monmc.bin 1K
+   mspr.bin 2K 
+   ocode.bin 1K
+   pat1.pcn 1K
+   patdes.bas 8K
+   pgen.bas 11K
+   rom.icn 2K
+   rsxb.bin 2K
+   scrload.bas 2K
+   vdutab.o 1K
+
+
+ Disco3
+  Max desk oculto
+   maxdesk 1k
+   maxdesk.n01 1k
+   maxdesk.n02 34k
+   maxdesk.n04 17k
+   maxdesk.n05 2k
+   sysvars.bin 1k
+   dragon attack
+   block1.bin 5K
+   block2.bin 4K
+   block3.bin 5K
+   block4.bin 5K
+   block5.bin 5K
+   block6.bin 5K
+   block7.bin 5K
+   block8.bin 5K
+   code.bin 28K
+   disc.bin 1k
+   disc-ni.bin 1k
+</pre>
+
+
+
 <br>
 <h1>AMX Mouse</h1>
 Para poder usar un ratón como si fuera un AMX Mouse, se requiere activar en el fichero de configuración el soporte.
@@ -138,19 +210,31 @@ Si no queremos usar una placa TTGO VGA32 v1.x, podemos construirla siguiendo el 
 
 <br><br>
 <h1>Tool dsk2h</h1>
-He creado una herramienta muy básica, para convertir los archivos .dsk en .h en modo lista para ser procesados por el emulador. Tan sólo tenemos que dejar los archivos .dsk en la carpeta <b>dsks</b> y ejecutar el archivo <b>dsk2h.exe</b>, de forma que se generará una salida en el directorio <b>dataFlash</b>. Para pruebas, se ha dejado 2 archivos en el directorio <b>dsks</b>, que se recomienda borrar en caso de realizar una nueva lista personalizada. También se recomienda borrar los archivos del directorio <b>CPCem\dataFlash\dsk</b> para tener un proyecto limpio.<br><br>
+He creado una herramienta muy básica, para convertir los archivos .dsk en .h, así como roms en modo lista para ser procesados por el emulador. Tan sólo tenemos que dejar los archivos .dsk en la carpeta <b>dsks</b>, así como .rom en <b>romextra</b> y ejecutar el archivo <b>dsk2h.exe</b>, de forma que se generará una salida en el directorio <b>dataFlash</b>. Para pruebas, se ha dejado 2 archivos en el directorio <b>dsks</b>, así como un par de roms, que se recomienda borrar en caso de realizar una nueva lista personalizada. También se recomienda borrar los archivos del directorio <b>CPCem\dataFlash\dsk</b> para tener un proyecto limpio.<br><br>
 <a href='https://github.com/rpsubc8/ESP32TinyCPC/tree/main/tools/dsk2h'>Tool dsk2h</a>
 <br><br>
 <pre>
- dsks/
- dataFlash/
+ input/
+  dsks/
+  romextra/
+ output/ 
+  dataFlash/
    dsk/
+   romextra/   
 </pre>
 Posteriormente debemos copiar el directorio <b>dataFlash</b> en el proyecto <b>TinyCPCEMttgovga32\CPCem</b> sobreescribiendo la carpeta dataFlash previa. Se recomienda limpiar el proyecto y volver a compilar.<br>
 Esta herramienta es muy simple, y no controla los errores, por lo que se recomienda dejarle los archivos con nombres muy simples y lo más sencillo posible.<br>
 El proyecto en PLATFORM.IO está preparado para 2 MB de Flash. Si necesitamos los 4MB de flash, tendremos que modificar la entrada del archivo <b>platformio.ini</b>
 <pre>board_build.partitions = huge_app.csv</pre>
 En el Arduino IDE, debemos elegir la opción <b>Partition Scheme (Huge APP)</b>.
+
+
+<br><br>
+<h1>Cargar ROMS</h1>
+Los juegos en formato ROM (16 KB), se pueden cargar en LOW y en HIGH (slot 0 al 15). Cuando se selecciona la opción de <b>Run ROM</b> se autoescribe el nombre de la ROM que se invoca como comando RSX. Este comando RSX coincide con el nombre del archivo rom que se generó, por lo que debemos darle el nombre de archivo .ROM exacto al que se invoca.
+<br>
+Cuando queramos cargar otro juego, debemos resetear, o bien seleccionando el menú de Machine o bien Reset.
+
 
 <br><br>
 <h1>CPM</h1>
