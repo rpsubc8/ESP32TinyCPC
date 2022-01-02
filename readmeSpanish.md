@@ -235,7 +235,7 @@ Los juegos en formato ROM (16 KB), se pueden cargar en LOW y en HIGH (slot 0 al 
 <br>
 Cuando queramos cargar otro juego, debemos resetear, o bien seleccionando el menú de Machine o bien Reset.
 <br>
-Si queremos lanzar el juego <b>arkanoid</b>, debemos elegir desde el menú <b>Load or Run ROM<b>, luego <b>Run ROM</b> y por último nos pedirá seleccionar <b>Arkanoid</b>. Al finalizar, seleccionamos <b>High ROM(0..15)</b>, en donde ponemos por ejemplo el slot 1, y en un par de segundos, se escribirá <b>|arkanoid</b>.
+Si queremos lanzar el juego <b>arkanoid</b>, debemos elegir desde el menú <b>Load or Run ROM</b>, luego <b>Run ROM</b> y por último nos pedirá seleccionar <b>Arkanoid</b>. Al finalizar, seleccionamos <b>High ROM(0..15)</b>, en donde ponemos por ejemplo el slot 1, y en un par de segundos, se escribirá <b>|arkanoid</b>.
 <br>
 Si elegimos sólo <b>Load ROM</b>, hará lo mismo que lo anterior, pero sin lanzar el RSX <b>|arkanoid</b>. Este nombre de archivo debe coincidir con el nombre real del juego interno.
 <br>
