@@ -55,7 +55,7 @@
  #define use_lib_lookup_znptable16
 
  //Logs (si no se usa, va mas rapido)
- #define use_lib_log_serial
+ //#define use_lib_log_serial
  
 
 

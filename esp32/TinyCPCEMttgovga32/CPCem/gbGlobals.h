@@ -215,6 +215,10 @@ extern unsigned char soundon;
  extern unsigned char gb_mouse_ps2data;
 #endif 
 
+extern unsigned char gb_run_rom;
+extern unsigned char gb_id_run_rom;
+extern unsigned int gb_timer_run_rom_ini;
+
 #endif
 
  

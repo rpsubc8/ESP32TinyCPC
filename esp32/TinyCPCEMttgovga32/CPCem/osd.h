@@ -10,4 +10,5 @@
  void SDLEsperaTeclado(void);
  void SDLprintCharOSD(char car,int x,int y,unsigned char color,unsigned char backcolor);
  void SDLprintText(const char *cad,int x, int y, unsigned char color,unsigned char backcolor);
+ void ShowTinyRunROMMenu(unsigned char idRom);
 #endif

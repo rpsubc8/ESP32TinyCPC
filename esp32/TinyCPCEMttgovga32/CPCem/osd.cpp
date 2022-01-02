@@ -5,10 +5,15 @@
 #include "FDC.h"
 #include "Z80.h"
 #include "dataFlash/gbdsk.h"
+#include "dataFlash/gbromextra.h"
 #include "gbGlobals.h"
 #include "PS2Kbd.h"
 #include "gb_sdl_font8x8.h"
 
+
+unsigned char gb_run_rom=0;
+unsigned char gb_id_run_rom=0;
+unsigned int gb_timer_run_rom_ini=0;
 
 //#define BLACK   0
 //#define BLUE    4
@@ -76,15 +81,53 @@ const char * gb_osd_screen_values[max_gb_osd_screen_values]={
 };
 
 
-#define max_gb_main_menu 8
+#define max_gb_main_menu 9
 const char * gb_main_menu[max_gb_main_menu]={
  "Machine",
+ "Load or Run ROM",
  "Load DSK",
  "Speed",
  "Screen Adjust",
  "Mouse",
  "Sound",
  "Reset",
+ "Return"
+};
+
+
+#define max_gb_romloadrun_menu 3
+const char * gb_romloadrun_menu[max_gb_romloadrun_menu]={
+ "Load ROM",
+ "Run ROM",
+ "Return"
+};
+
+#define max_gb_romlowhigh_menu 3
+const char * gb_romlowhigh_menu[max_gb_romlowhigh_menu]={
+ "Low ROM",
+ "High ROM(0..15)",
+ "Return"
+};
+
+
+#define max_gb_osd_rom_id_values 17
+const char * gb_osd_rom_id_values[max_gb_osd_rom_id_values]={
+ "0",
+ "1",
+ "2", 
+ "3", 
+ "4",
+ "5",
+ "6",
+ "7",
+ "8",
+ "9",
+ "10",
+ "11",
+ "12",
+ "13",
+ "14",
+ "15",
  "Return"
 };
 
@@ -418,7 +461,80 @@ void ShowTinyDSKMenu()
  }         
 }
 
-//Menu ROM
+//****************************************************
+unsigned char ShowTinyLoadROMMenu()
+{
+ unsigned char aSelLoadROM,aSelIdROM,aSelLowHigh;     
+ unsigned char aReturn=255;
+ aSelLoadROM= ShowTinyMenu("Load ROM",gb_list_romextra_title,max_list_romextra);
+ if (aSelLoadROM != 255)
+ {
+  aSelLowHigh= ShowTinyMenu("LOW OR HIGH ROM",gb_romlowhigh_menu,max_gb_romlowhigh_menu);   
+  if (aSelLowHigh == 0)
+  {//Low
+   lorom= (unsigned char*)gb_list_romextra_data[aSelLoadROM];
+   pc=0; //reset
+   aReturn= aSelLoadROM;
+  }
+  else
+  {//High
+   aSelIdROM= ShowTinyMenu("BANK ROM HIGH",gb_osd_rom_id_values,max_gb_osd_rom_id_values);                   
+   if (aSelIdROM!=255)
+   {
+    hirom[aSelIdROM]= (unsigned char*)gb_list_romextra_data[aSelLoadROM];
+    pc=0; //reset
+    aReturn= aSelLoadROM;
+   }
+  }  
+ }
+ return aReturn;    
+}
+
+//***********************************************************
+void ShowTinyRunROMMenu(unsigned char idRom)
+{
+ unsigned char aSelLoadROM;   
+ //0xAC8A(6128)	0xACA4(464)	0x100 BASIC input area for lines (as typed in and not tokenised) or for INPUT
+ //aSelRunROM= ShowTinyMenu("Run ROM",gb_list_rom_title,max_list_rom);
+ //aSelLoadROM= ShowTinyMenu("Run ROM",gb_list_rom_title,max_list_rom);    
+ aSelLoadROM= idRom;
+ printf("ShowTinyRunROMMenu:%d\n",idRom);
+ fflush(stdout);
+ if (aSelLoadROM != 255)
+ {
+  unsigned off= (model==2)? 0xAC8A:0xACA4;
+  memset(&ram[off],0,0x100); //Borramos el buffer texto BASIC
+  //unsigned off= 0xB514;
+  ram[off++]= 0x7C; //caracter |
+  int longitud= strlen(gb_list_romextra_title[aSelLoadROM]);
+  for (int i=0;i<longitud;i++)
+  {
+   ram[off++]= gb_list_romextra_title[aSelLoadROM][i];
+  }
+ }     
+}
+//***********************************************************
+void ShowTinyROMMenu()
+{
+ unsigned char aSelNum,aSelLoadROM,aSelRunROM,aSelIdROM,aSelLowHigh;
+ aSelNum = ShowTinyMenu("Load OR Run ROM",gb_romloadrun_menu,max_gb_romloadrun_menu);
+ switch (aSelNum)
+ {
+  case 0: ShowTinyLoadROMMenu(); break;
+  case 1:
+   aSelRunROM= ShowTinyLoadROMMenu();
+   if (aSelRunROM != 255)
+   {
+    //ShowTinyRunROMMenu(aSelRunROM);
+    gb_run_rom= 1;
+    gb_id_run_rom= aSelRunROM;
+    gb_timer_run_rom_ini= millis();    
+   }
+   break;
+ }
+}
+
+//Menu ROM Machine
 void ShowTinyMachineMenu()
 {
  //unsigned char aSelNum;
@@ -705,15 +821,16 @@ void do_tinyOSD()
   switch (aSelNum)
   {
    case 0: ShowTinyMachineMenu(); break;
-   case 1: ShowTinyDSKMenu(); break;
+   case 1: ShowTinyROMMenu(); break;
+   case 2: ShowTinyDSKMenu(); break;
 //   case 2: ShowTinyTAPEMenu(); break;
 //   case 3: ShowTinySelectTAPEMenu(); break;
 //   case 4: ShowTinySCRMenu(); break;
-   case 2: ShowTinySpeedMenu(); break;
-   case 3: ShowTinyScreenAdjustMenu(); break;
-   case 4: ShowTinyMouseMenu(); break;
-   case 5: ShowTinySoundMenu(); break;
-   case 6: ShowTinyResetMenu(); break; 
+   case 3: ShowTinySpeedMenu(); break;
+   case 4: ShowTinyScreenAdjustMenu(); break;
+   case 5: ShowTinyMouseMenu(); break;
+   case 6: ShowTinySoundMenu(); break;
+   case 7: ShowTinyResetMenu(); break; 
     //resetz80();
     //resetcrtc();
     //SDL_Delay(2);

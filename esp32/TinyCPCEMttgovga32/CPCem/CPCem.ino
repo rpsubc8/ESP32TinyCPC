@@ -296,6 +296,9 @@ unsigned char soundon;
 #endif
 
 
+void PollRunROM(void);
+
+
 void SDL_keys_poll()
 {
 
@@ -705,6 +708,25 @@ void setup()
 
 
 
+//**********************************************
+void PollRunROM()
+{
+ if ((millis()-gb_timer_run_rom_ini) > 1000)
+ {
+  gb_run_rom= 0;
+  if (gb_id_run_rom != 255)
+  {
+   ShowTinyRunROMMenu(gb_id_run_rom);
+   cpckeys[2][2]= 0; //Pulso ENTER
+   printf("run rom\n");
+   fflush(stdout);             
+  }
+ } 
+}
+
+
+
+
 // +-------------+
 // | LOOP core 1 |
 // +-------------+
@@ -731,7 +753,11 @@ void loop()
  do_tinyOSD();
 
  if ((gb_current_delay_emulate_ms == 0) || (gb_run_emulacion == 1))
- {     
+ {
+  if (gb_run_rom == 1)
+  {
+   PollRunROM();
+  }
   #ifdef use_lib_measure_time  
    tiempo_ini_cpu= millis();
    jj_ini_cpu = micros();
