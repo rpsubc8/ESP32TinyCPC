@@ -23,6 +23,7 @@ He realizado varias modificaciones:
  <li>Emulacion CPC 6128 (inestable)</li>
  <li>Emulación de AMX Mouse (librería reducida de <b>Rob Kent</b> jazzycamel)</li>
  <li>Ya se permite tener el modo de video 400x300 64 colores, el modo 128 KB, así como el ratón y el sonido todo activo.</li>
+ <li>Paleta monocromo Verde para simular GT65</li>
 </ul> 
   
 <br>
@@ -249,6 +250,9 @@ Más información de ROMS:
 <h1>Monocromo</h1>
 En el modo de 64 colores, se ha añadido la posibilidad de elegir 3 tipos de paleta de color monocromo verde. Dado que el DAC es de 6 bits, sólo se permite 11 niveles de verde, además del negro.
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/paletaVerde.gif'></center>
+Por tanto, no podemos conseguir la misma calidad que un monitor GT65.
+<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/wecLemans.gif'></center>
+
 
 
 <br><br>
