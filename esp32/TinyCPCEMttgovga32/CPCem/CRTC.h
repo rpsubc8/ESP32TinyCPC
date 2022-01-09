@@ -15,6 +15,10 @@
  void writecrtc(unsigned short a, unsigned char v);
  unsigned char readcrtc(unsigned short a);
  void PrepareColorsUltraFastVGA(void);
+ #ifndef use_lib_vga8colors
+  void PreparaMonocromoVerde(unsigned char auxId);
+  void PreparaPaletaColor(void);
+ #endif
  //#ifdef use_lib_ultrafast_vga  
  // void PrepareColorsUltraFastVGA(void);
  //#endif 

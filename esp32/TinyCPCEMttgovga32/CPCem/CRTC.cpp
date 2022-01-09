@@ -156,6 +156,7 @@ static unsigned char gb_const_colorNormal35[35]={
 };
 #else
 //64 colores
+//BBGGRR
 static unsigned char gb_const_colorNormal35[35]={
   0,21,21,29,31,16,35,20,
   23,35,47,15,63,3,60,7,
@@ -170,6 +171,41 @@ static unsigned char gb_const_colorNormal35[35]={
  //MAGENTA, BLUE, BLACK 
 };
 #endif
+
+#ifndef use_lib_vga8colors
+ //BBGGRR
+ const unsigned char gb_const_paleta_color35[35]={
+  0,21,21,29,31,16,35,20,
+  23,35,47,15,63,3,60,7,
+  59,16,28,12,61,0,48,4,
+  36,17,29,14,62,1,49,5,
+  58,42,21
+ };
+
+ const unsigned char gb_const_paleta_verde35_0[35]={
+  0,0,4,24,4,8,8,9,
+  8,9,12,13,12,13,14,30,
+  0,4,4,24,4,8,24,25,
+  24,25,28,29,28,29,30,30,
+  0,4,24
+ };
+
+ const unsigned char gb_const_paleta_verde35_1[35]={
+  0,4,8,9,12,13,14,24,
+  25,28,29,30,0,4,8,9,
+  12,13,14,24,25,28,29,30,
+  0,4,8,9,12,13,14,24,
+  25,28,29
+ };
+
+ const unsigned char gb_const_paleta_verde35_2[35]={
+  0,0,0,4,4,4,8,8,
+  8,9,9,9,12,12,12,13,
+  13,13,14,14,14,24,24,24,
+  25,25,25,28,28,28,29,29,
+  29,30,30
+ };         
+#endif 
 
 
 
@@ -350,7 +386,7 @@ void SDLClear()
 // //jj_fast_putpixel(x,y,0);    
 //}
 
-
+//********************************************************************
 void PrepareColorsUltraFastVGA()
 {  
  //(color & RGBAXMask) | SBits;
@@ -365,6 +401,31 @@ void PrepareColorsUltraFastVGA()
  #endif
 }
 
+#ifndef use_lib_vga8colors
+ void PreparaMonocromoVerde(unsigned char auxId)
+ {
+  for (unsigned char i=0;i<35;i++)
+  {//DAC 6 bits 64 colores
+   switch (auxId)
+   {
+    case 0: gb_const_colorNormal35[i]= (gb_const_paleta_verde35_0[i] & 0x3F) | gb_sync_bits;
+     break;
+    case 1: gb_const_colorNormal35[i]= (gb_const_paleta_verde35_1[i] & 0x3F) | gb_sync_bits;     
+     break;
+    case 2: gb_const_colorNormal35[i]= (gb_const_paleta_verde35_2[i] & 0x3F) | gb_sync_bits;     
+     break;    
+    default: break;
+   }
+  }
+ }
+
+ void PreparaPaletaColor()
+ {
+  for (unsigned char i=0;i<35;i++){//DAC 6 bits 64 colores
+   gb_const_colorNormal35[i]= (gb_const_paleta_color35[i] & 0x3F) | gb_sync_bits;
+  }  
+ }
+#endif
 
 //#ifdef use_lib_ultrafast_vga 
 // //**************************************

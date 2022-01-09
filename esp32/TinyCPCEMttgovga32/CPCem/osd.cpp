@@ -58,7 +58,13 @@ unsigned char gb_show_osd_main_menu=0;
 
 
 
-
+#define max_gb_osd_palette 4
+const char * gb_osd_palette[max_gb_osd_palette]={  
+ "Colour",
+ "Mono Green 1",
+ "Mono Green 2",
+ "Mono Green 3",
+};
 
 #define max_gb_osd_screen 1
 const char * gb_osd_screen[max_gb_osd_screen]={
@@ -81,7 +87,7 @@ const char * gb_osd_screen_values[max_gb_osd_screen_values]={
 };
 
 
-#define max_gb_main_menu 9
+#define max_gb_main_menu 10
 const char * gb_main_menu[max_gb_main_menu]={
  "Machine",
  "Load or Run ROM",
@@ -90,6 +96,7 @@ const char * gb_main_menu[max_gb_main_menu]={
  "Screen Adjust",
  "Mouse",
  "Sound",
+ "Palette",
  "Reset",
  "Return"
 };
@@ -572,6 +579,26 @@ void ShowTinyResetMenu()
  }
 }
 
+
+//Menu resetear
+void ShowTinyPaletaMenu()
+{ 
+ #ifndef use_lib_vga8colors
+  unsigned char aSelNum; 
+  aSelNum= ShowTinyMenu("Color Palette",gb_osd_palette,max_gb_osd_palette);
+  switch (aSelNum)
+  {
+   case 0: PreparaPaletaColor(); break;
+   case 1: PreparaMonocromoVerde(0); break;
+   case 2: PreparaMonocromoVerde(1); break;   
+   case 3: PreparaMonocromoVerde(2); break;
+   default: return; break;
+  }
+  remakelookup();
+ #endif 
+}
+
+
 //Menu TAPE
 /*void ShowTinyTAPEMenu()
 {
@@ -829,8 +856,9 @@ void do_tinyOSD()
    case 3: ShowTinySpeedMenu(); break;
    case 4: ShowTinyScreenAdjustMenu(); break;
    case 5: ShowTinyMouseMenu(); break;
-   case 6: ShowTinySoundMenu(); break;
-   case 7: ShowTinyResetMenu(); break; 
+   case 6: ShowTinySoundMenu(); break;   
+   case 7: ShowTinyPaletaMenu(); break;
+   case 8: ShowTinyResetMenu(); break;
     //resetz80();
     //resetcrtc();
     //SDL_Delay(2);
