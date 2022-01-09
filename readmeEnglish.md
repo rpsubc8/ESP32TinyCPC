@@ -25,6 +25,7 @@ I have made several modifications:
  <li>CPC 6128 emulation (unstable)</li>
  <li>AMX Mouse emulation (reduced library by Rob Kent jazzycamel)</li>
  <li>It is now possible to have 400x300 64 color video mode, 128 KB mode, as well as mouse and sound all active.</li>
+ <li>Green monochrome palette to simulate GT65</li>
 </ul>
 
   
@@ -242,10 +243,18 @@ If we want to launch the game <b> arkanoid </b>, we must choose from the menu <b
 <br>
 If we choose just <b> Load ROM </b>, it will do the same as above, but without launching the RSX <b> | arkanoid </b>. This file name must match the actual name of the internal game.
 <br>
-If we have several ROMS games, for example <b> 3weeks.rom and 3weeks2.rom </b>, we must load 3weeks.rom in slot 1 and 3weeks.rom2 in slot 2, and finally launch the main one, which in this case would be <b> 3weeks.rom </b>
+If we have several ROMS games, for example <b> 3weeks.rom and 3weeks2.rom </b>, we must load 3weeks.rom in slot 1 and 3weeks2.rom in slot 2, and finally launch the main one, which in this case would be <b> 3weeks.rom </b>
 <br><br>
 More information about ROMS:
 <a href='https://www.cpcwiki.eu/index.php/ROM_List'>https://www.cpcwiki.eu/index.php/ROM_List</a>
+
+
+<br><br>
+<h1>Monocromo</h1>
+In 64-color mode, a choice of 3 types of green monochrome color palette has been added. Since the DAC is 6-bit, only 11 levels of green are allowed in addition to black.
+<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/paletaVerde.gif'></center>
+Therefore, we cannot achieve the same quality as a GT65 monitor.
+<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/wecLemans.gif'></center>
 
 
 <br><br>
