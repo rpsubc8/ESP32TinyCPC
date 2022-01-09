@@ -250,7 +250,7 @@ More information about ROMS:
 
 
 <br><br>
-<h1>Monocromo</h1>
+<h1>Monochrome</h1>
 In 64-color mode, a choice of 3 types of green monochrome color palette has been added. Since the DAC is 6-bit, only 11 levels of green are allowed in addition to black.
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/paletaVerde.gif'></center>
 Therefore, we cannot achieve the same quality as a GT65 monitor.
