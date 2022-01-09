@@ -245,6 +245,11 @@ Más información de ROMS:
 <a href='https://www.cpcwiki.eu/index.php/ROM_List'>https://www.cpcwiki.eu/index.php/ROM_List</a>
  
 
+<br><br>
+<h1>Monocromo</h1>
+En el modo de 64 colores, se ha añadido la posibilidad de elegir 3 tipos de paleta de color monocromo verde. Dado que el DAC es de 6 bits, sólo se permite 11 niveles de verde, además del negro.
+<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyCPC/main/preview/paletaVerde.gif'></center>
+
 
 <br><br>
 <h1>CPM</h1>
