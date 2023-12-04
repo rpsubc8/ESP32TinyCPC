@@ -136,8 +136,7 @@ Everything has been compacted into several discs:
    disc.bas 1K   
    loader.bin 1K
   amsthree (run "amsthree.bin")
-   amsthree.bin 38K
-   loader.bas 1K
+   amsthree.bin 38K   
   sokoban (run "sokoban.bin")
    sokoban.bin 9K
    sokoban.dat 19K
