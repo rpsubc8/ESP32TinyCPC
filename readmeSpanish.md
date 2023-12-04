@@ -117,8 +117,7 @@ El archivo <b>gbConfig.h</b> se seleccionan las opciones:
 Al arrancar el ESP32, se realiza en modo CPC464 cargando el BASIC.
 Podemos elegir los siguientes juegos:
 <ul>
- <li><b>Corsair Trainer</b></li>
- <li><b>Dragon Attack</b></li>
+ <li><b>Corsair Trainer</b></li> 
  <li><b>Babas Palace</b></li>
  <li><b>Amsthrees</b></li>
  <li><b>Sokoban</b></li>
@@ -129,31 +128,28 @@ Podemos elegir los siguientes juegos:
 Se ha compactado todo en varios discos:
 <pre> 
  Disco 1 
-  babaspalace
+  babaspalace (run "disc.bas")
    cod0.bin 40K
    cod1.bin 2K
-   disc.bas 1K
-   intro.bin 9K
-   loader.bin 1K
-   screen.scr 17K
-  amsthree
-   amsthre3.scr 17K
+   disc.bas 1K   
+   loader.bin 1K   
+  amsthree (run "amsthree.bin")   
    amsthree.bin 38K
    loader.bas 1K
-  sokoban
+  sokoban (run "sokoban.bin")
    sokoban.bin 9K
    sokoban.dat 19K
  
  
  Disco 2
-  corsair trainer
+  corsair trainer (run "disc.bin")
    code.bin 16K
    codex.bin 16K
    data.bin 17K
    disc.bin 8K
    intro.bin 17K
    menuexo.bin  3K
-  amxmousev2
+  amxmousev2 (run "amx.bas")
    amx.bas 1K
    art.bin 9K
    art.icn 2K
@@ -175,25 +171,13 @@ Se ha compactado todo en varios discos:
 
 
  Disco3
-  Max desk oculto
+  Max desk oculto (run "maxdesk")
    maxdesk 1k
    maxdesk.n01 1k
    maxdesk.n02 34k
    maxdesk.n04 17k
    maxdesk.n05 2k
    sysvars.bin 1k
-   dragon attack
-   block1.bin 5K
-   block2.bin 4K
-   block3.bin 5K
-   block4.bin 5K
-   block5.bin 5K
-   block6.bin 5K
-   block7.bin 5K
-   block8.bin 5K
-   code.bin 28K
-   disc.bin 1k
-   disc-ni.bin 1k
 </pre>
 
 
